@@ -18,7 +18,6 @@ tags:
 knitr::opts_chunk$set(warning=FALSE, echo=FALSE, comment=NA, message=FALSE)
 ```
 
-
 #### My first official post
 
 Alright. I realised that my first post wasn't supposed to be online, so I had to remove it for good reasons. Anyhow, I'm still keen on getting my first official data science post up, so here we go!
