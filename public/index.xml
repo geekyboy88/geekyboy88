@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Lithium Theme</title>
+    <link>/</link>
+    <description>Recent content on Lithium Theme</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 19 Dec 2017 21:13:14 -0500</lastBuildDate>
+    
+	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>First Post</title>
+      <link>/2017/12/19/first-post/</link>
+      <pubDate>Tue, 19 Dec 2017 21:13:14 -0500</pubDate>
+      
+      <guid>/2017/12/19/first-post/</guid>
+      <description>Hi everyone, this is my first blog post here.
+I enjoy working on data, and will be starting to post some of my work here.
+Hope you will find this interesting! :)</description>
+    </item>
+    
+    <item>
+      <title>Unmarked in the 18-yard box</title>
+      <link>/2017/12/20/unmarked-in-the-18-yard-box/</link>
+      <pubDate>Wed, 20 Dec 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/12/20/unmarked-in-the-18-yard-box/</guid>
+      <description>Soccer Analytics My very first data analytics post! I would like to dedicate my first post to a sport/hobby that I have really enjoyed since I was young, Soccer! I still recall the first ever match that I watched: Manchester United vs Liverpool in the 3rd round of the FA cup in United’s treble winning season. United were 1-0 down to a goal from Michael Owen, but scored 2 goals right at the death to move on to the 4th round.</description>
+    </item>
+    
+    <item>
+      <title>About</title>
+      <link>/about/</link>
+      <pubDate>Thu, 05 May 2016 21:48:51 -0700</pubDate>
+      
+      <guid>/about/</guid>
+      <description>Lorem ipsum dolor sit amet.</description>
+    </item>
+    
+  </channel>
+</rss>

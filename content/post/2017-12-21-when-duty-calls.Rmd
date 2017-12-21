@@ -1,0 +1,53 @@
+---
+title: When Duty Calls
+author: geekyboy88
+date: '2017-12-21'
+slug: when-duty-calls
+categories:
+  - R
+  - Text
+  - Analytics
+  - Mediacorp
+tags:
+  - R
+  - TextAnalytics
+  - Mediacorp
+---
+
+#### My first official post
+
+Alright. I realised that my first post wasn't supposed to be online, so I had to remove it for good reasons. Anyhow, I'm still keen on getting my first official data science post up, and here we go!
+
+#### 
+
+
+
+```{r, readdata}
+data = read.csv("../../static/data/theduty.csv", stringsAsFactors = F)
+data$X = NULL
+
+# clean up data
+data$Post = gsub("\t","",data$Post)
+data$Time = gsub("\t\t\n\t\t\t\n\t\t\t\n\t\t\t","",data$Time)
+data$Time = gsub("\n\t\t\t\n\t\t\t\t\t\t\t\n\t\t","",data$Time)
+data$Username %<>% trimws()
+
+data$Date = ifelse(grepl("Today", data$Time) == T, as.Date("2017-08-26"), 
+                   ifelse(grepl("Yesterday", data$Time) == T, as.Date("2017-08-25"),
+                          as.Date(substr(data$Time,1,10), "%d-%m-%Y")))
+data$Date %<>% as.Date(origin = "1970-01-01")
+data$Time1 = gsub("^.*, ","",data$Time)
+data$Hour = substr(data$Time1, 1, 2) %>% as.numeric()
+
+
+
+
+```
+
+
+
+
+
+
+
+

@@ -1,0 +1,27 @@
+baseurl = "https://geekyboy88.netlify.com/"
+languageCode = "en-us"
+title = "geekyboy88"
+theme = "hugo-lithium-theme"
+googleAnalytics = ""
+disqusShortname = ""
+
+[permalinks]
+    post = "/:year/:month/:day/:title/"
+    page = "/:title/"
+
+[[menu.main]]
+    name = "About myself"
+    url = "/about/"
+[[menu.main]]
+    name = "GitHub"
+    url = "https://github.com/geekyboy88/geekyboy88/"
+
+[params]
+    description = "Just a geeky blog to share my data analytics interest :)"
+
+    [params.logo]
+    url = "logo.png"
+    width = 50
+    height = 50
+    alt = "Logo"
+
