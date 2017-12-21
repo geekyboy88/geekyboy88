@@ -1,0 +1,151 @@
+---
+title: When Duty Calls
+author: geekyboy88
+date: '2017-12-21'
+slug: when-duty-calls
+categories:
+  - R
+  - Text
+  - Analytics
+  - Mediacorp
+tags:
+  - R
+  - TextAnalytics
+  - Mediacorp
+---
+
+
+
+<div id="my-first-official-post" class="section level4">
+<h4>My first official post</h4>
+<p>Alright. I realised that my first post wasn’t supposed to be online, so I had to remove it for good reasons. Anyhow, I’m still keen on getting my first official data science post up, so here we go!</p>
+</div>
+<div id="mediacorp-channel-8-prime-time" class="section level4">
+<h4>Mediacorp Channel 8 Prime Time</h4>
+<p>To start off, I need to introduce some facts about myself. I not too recently got married, got my own house, and my own <strong>television</strong>. This gave me quite a bit of freedom as to what I wanted to watch after I come home from work each day (<em>particularly as parents always have first choice on what show is screening on the family tv</em>).</p>
+<p>I must also admit that my mandarin isn’t particularly strong despite coming from a bilingual education system, given that <em>english</em> has always been the main form of communication in my life. Hence, to ensure that I do not lose sight of my mother tongue, I thought it would be good practice to spend some time watching TV shows in Chinese. Naturally, mediacorp’s <a href="https://tv.toggle.sg/en/channel8/">channel 8</a> 9pm prime time slot comes to mind (<em>as this is the time that I will definitely be home after work</em>)</p>
+</div>
+<div id="when-duty-calls" class="section level4">
+<h4>When Duty Calls</h4>
+<p>So I got hooked at a time when they were showing <a href="https://video.toggle.sg/en/video/series/when-duty-calls/ep1/520403">When Duty Calls</a>, a show sponsored by MINDEF &amp; MHA to commemorate 50 years of national service. Honestly, I thought that the show provided quite a bit of entertainment value, and the idea of national service very easily resonates with majority of us Singaporeans.</p>
+</div>
+<div id="additional-entertainment-value" class="section level4">
+<h4>Additional entertainment value</h4>
+<p>However, beyond the show, I was also interested to find out what Singaporeans thought of this show. In this instance, one could think of no better source than HardwareZone’s EDMW. Soon, I found out that there is an official dedicated thread for this show. So I thought, why not put this thread through some data work and see what I could get!</p>
+</div>
+<div id="text-data" class="section level4">
+<h4>Text Data</h4>
+<p>The data that I collected were the individual posts, and the timing of these postings. If you are interested, the official link can be found <a href="http://forums.hardwarezone.com.sg/tv-mania-animemania-266/mediacorpse-50th-national-service-drama-5571280.html">here</a>.</p>
+</div>
+<div id="when-do-people-post" class="section level4">
+<h4>When do people post?</h4>
+<p>The first thing I thought we would be interested to find out is: <strong>when do people post</strong>? From the chart below, we can see the huge cluster of posts that happen when the show starts. Well, this is not really surprising, as we find little reason for people to be on this hardwarezone thread at any other time of the day. We can also see that the number of comments start to pick up as we approach the end of the show, and slowly tapers off past 10pm-ish. Well, that’s about bedtime for most people, so I guess its appropriate that the number of posts go down too.</p>
+<pre class="r"><code>library(magrittr)
+library(dplyr)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>library(stringr)
+library(ggplot2)
+library(stringr)
+library(gtools)
+library(wordcloud)</code></pre>
+<pre><code>## Loading required package: RColorBrewer</code></pre>
+<pre class="r"><code>library(Stack)
+library(wordVectors)
+library(tm)</code></pre>
+<pre><code>## Loading required package: NLP</code></pre>
+<pre><code>## 
+## Attaching package: &#39;NLP&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     annotate</code></pre>
+<pre class="r"><code>data = read.csv(&quot;../../static/data/theduty.csv&quot;, stringsAsFactors = F)
+data$X = NULL
+data$Hour = substr(data$Time1,1,2) %&gt;% as.numeric()
+data$Time1 = gsub(&quot;^.*, &quot;,&quot;&quot;,data$Time)
+data$Time1 = paste0(ifelse(substr(data$Time1,7,8) == &quot;PM&quot;, 
+                           data$Time1 %&gt;% substr(1,2) %&gt;% as.numeric() + 12, 
+                           data$Time1 %&gt;% substr(1,2) %&gt;% as.numeric()), 
+                    &quot;:&quot;,  data$Time1 %&gt;% substr(4,5))
+data$Time1 = ifelse(data$Time1 %&gt;% str_length() == 4, paste0(&quot;0&quot;,data$Time1), data$Time1)
+data$Time1 = ifelse(data$Time1 %&gt;% substr(1,2) == &quot;24&quot;, gsub(&quot;24&quot;,&quot;00&quot;, data$Time1), data$Time1)
+data %&gt;% 
+  ggplot(aes(x = Time1, fill = ..count..)) +
+  geom_bar() +
+  theme_classic() +
+  labs(x = &quot;Time / Minute&quot;, y = &quot;Number of Posts&quot;, title = &quot;Chart 1: Number of Posts by Time of the Day&quot;) +
+  theme(text = element_text(size = 14),
+        axis.text.x = element_text(size = 14),
+        axis.text.y = element_text(size = 14)) +
+  scale_x_discrete(breaks = c(&quot;00:00&quot;,&quot;01:00&quot;,&quot;02:00&quot;,&quot;03:00&quot;,&quot;04:00&quot;,&quot;05:00&quot;,&quot;06:00&quot;,&quot;07:00&quot;,&quot;08:00&quot;,&quot;09:00&quot;,&quot;10:00&quot;,&quot;11:00&quot;,&quot;12:00&quot;,&quot;13:00&quot;,&quot;14:00&quot;,&quot;15:00&quot;,&quot;16:00&quot;,&quot;17:00&quot;,&quot;18:00&quot;,&quot;19:00&quot;,&quot;20:00&quot;,&quot;21:00&quot;,&quot;22:00&quot;,&quot;23:00&quot;)) +
+  scale_fill_continuous(low=&quot;blue&quot;, high=&quot;red&quot;)</code></pre>
+<p><img src="/post/2017-12-21-when-duty-calls_files/figure-html/readdata-1.png" width="672" /></p>
+</div>
+<div id="popular-actor-actresses" class="section level4">
+<h4>Popular Actor / Actresses?</h4>
+<p>If you had taken a look at the wikipedia link that I had shared above, you would likely to have noticed that the cast of this TV show is relatively solid. But us as humans also have a tendency to pick our favorites, and I would suppose that in our conversations with others about the show, it is natural for us to talk more frequently about our favourite cast. Aggregated across an entire community, we can then find out which of the cast members is the fan favourite!</p>
+<p>Make a guess? Who amongst the cast members do you think would be the most popular? (<em>Do not peek!</em>)</p>
+<pre class="r"><code>df = Corpus(VectorSource(data$Post))
+df %&lt;&gt;% tm_map(removePunctuation, preserve_intra_word_dashes = T)
+df %&lt;&gt;% tm_map(content_transformer(tolower))
+df %&lt;&gt;% tm_map(removeNumbers)
+df %&lt;&gt;% tm_map(stripWhitespace)
+df1 = df %&gt;% tm_map(removeWords, stopwords(&quot;en&quot;))
+characters = c(&quot;desmond&quot;,&quot;felicia&quot;,&quot;kym&quot;,&quot;paige&quot;,&quot;pierre&quot;,&quot;romeo&quot;,&quot;meixin&quot;,&quot;kim&quot;,&quot;cloudie&quot;,&quot;jasmine&quot;,&quot;poh&quot;,&quot;longbin&quot;,&quot;xianfeng&quot;,&quot;yixuan&quot;,&quot;zheng&quot;,&quot;sim&quot;,&quot;james&quot;,&quot;weiguo&quot;,&quot;zgp&quot;,&quot;fel&quot;,&quot;jun&quot;,&quot;guang&quot;,&quot;shane&quot;,&quot;richie&quot;,&quot;pow&quot;,&quot;koh&quot;,&quot;junguang&quot;,&quot;junguangs&quot;,&quot;jingyu&quot;,&quot;meiguang&quot;,&quot;jinbao&quot;,&quot;yongzheng&quot;,&quot;yiyun&quot;,&quot;ge&quot;,&quot;geping&quot;,&quot;ping&quot;)
+df1 %&lt;&gt;% tm_map(removeWords, characters)
+
+wcm = TermDocumentMatrix(df)
+wcm1 = TermDocumentMatrix(df1)
+rm(df, df1, c)</code></pre>
+<pre><code>## Warning in rm(df, df1, c): object &#39;c&#39; not found</code></pre>
+<pre class="r"><code>meta = wcm %&gt;% as.matrix() %&gt;% as.data.frame()
+meta$total_count = rowSums(meta)
+
+meta$rowname = meta %&gt;% row.names()
+c = meta %&gt;% filter(rowname %in% characters)
+meta$rowname = NULL
+c = c[,c(&quot;total_count&quot;,&quot;rowname&quot;)] %&gt;% as.data.frame
+c$characters = ifelse(c$rowname %in% c(&quot;fel&quot;,&quot;jingyu&quot;), &quot;felicia&quot;,
+                      ifelse(c$rowname %in% c(&quot;kim&quot;,&quot;poh&quot;,&quot;jinbao&quot;), &quot;pierre&quot;,
+                             ifelse(c$rowname %in% c(&quot;jun&quot;,&quot;guang&quot;,&quot;junguang&quot;,&quot;junguangs&quot;), &quot;desmond&quot;,
+                                    ifelse(c$rowname %in% c(&quot;longbin&quot;),&quot;romeo&quot;,
+                                           ifelse(c$rowname %in% c(&quot;weiguo&quot;,&quot;pow&quot;), &quot;shane&quot;,
+                                                  ifelse(c$rowname %in% c(&quot;koh&quot;,&quot;xianfeng&quot;),&quot;richie&quot;,
+                                                         ifelse(c$rowname %in% c(&quot;zheng&quot;,&quot;yongzheng&quot;,&quot;ge&quot;,&quot;geping&quot;,&quot;ping&quot;), &quot;zgp&quot;,
+                                                                ifelse(c$rowname %in% c(&quot;yixuan&quot;), &quot;paige&quot;,
+                                                                       ifelse(c$rowname %in% c(&quot;seah&quot;), &quot;james&quot;,
+                                                                              ifelse(c$rowname %in% c(&quot;sim&quot;,&quot;yiyun&quot;,&quot;cloudie&quot;), &quot;jasmine&quot;,
+                                                                                     ifelse(c$rowname %in% c(&quot;meiguang&quot;), &quot;kym&quot;,
+                                                                                            c$rowname)))))))))))
+
+
+# who is the most popular (talked about) mediacorp actor/actress?
+c %&gt;% 
+  group_by(characters) %&gt;%
+  summarize(count = sum(total_count)) %&gt;%
+  ggplot(aes(x = reorder(characters,-count), y = count, fill = count)) +
+  geom_bar(stat = &quot;identity&quot;) +
+  theme_classic() +
+  theme(axis.text.x = element_text(size = 14, hjust = 1, angle = 90, colour = &quot;black&quot;), legend.position = &quot;none&quot;, text = element_text(size = 14)) +
+  labs(x = &quot;Mediacorp Actor/Actresses&quot;, y = &quot;Number of word mentions&quot;, title = &quot;Chart 2: Number of Name Mentions by Cast-Member&quot;) +
+  scale_fill_continuous(low = &quot;blue&quot;, high = &quot;red&quot;)</code></pre>
+<p><img src="/post/2017-12-21-when-duty-calls_files/figure-html/pops-1.png" width="672" /></p>
+<p>Well, I’m sure there’s nothing stopping you from scrolling down to take a look. Anyhow, if you follow the local media scene, I’m sure you would be rougly familiar with <a href="https://en.wikipedia.org/wiki/Paige_Chua">Paige Chua</a>, who has come in top as our fan favourite cast member for “When Duty Calls”. Following close behind is <a href="https://en.wikipedia.org/wiki/Desmond_Tan/">Desmond Tan</a>, who (as I just read from Wikipedia) has a fan club called <strong>Destanation</strong> and is considered one of the 8 <strong>Dukes</strong> of Mediacorp. <a href="https://en.wikipedia.org/wiki/Pierre_Png">Pierre Png</a>, well you all should know who he is right. He came in third.</p>
+</div>
+<div id="wordcloud" class="section level4">
+<h4>WordCloud</h4>
+<p>Lastly, I thought it would also be interesting to find out which are the most commonly words that are used in the thread. What I did was to parse each post (<em>usually in sentences or at least phrases</em>) into words, following which, for each word, I counted the number of occurances of each word, and summed up across the entire thread. As I am typing this, I realise I should have explained this earlier when finding out who the most popular cast member was, but I’m a little too lazy to backtrack, so… nevermind!</p>
+<p>In the word cloud, the size of the word reflects the number of occurances of that particular word, i.e. the <strong>larger</strong> the word, the more frequently it was used. I wouldn’t be spending time to talk much about the wordcloud. I think that it is rather self-explanatory, and I hope you have a good laugh when you encounter some “familiar” words :).</p>
+<pre class="r"><code>meta1 = wcm1 %&gt;% as.matrix() %&gt;% as.data.frame()
+meta1$total_count = rowSums(meta1)
+pal2 &lt;- brewer.pal(8,&quot;Dark2&quot;)
+dev.new(width=10, height=10)
+wordcloud(row.names(meta1), meta1$total_count, min.freq = 3, scale = c(8,.2),max.words = 100, random.order = F, random.color = FALSE, colors= pal2, fixed.asp = F, rot.per = 0)</code></pre>
+<p>Hope you enjoy my first official post!</p>
+</div>

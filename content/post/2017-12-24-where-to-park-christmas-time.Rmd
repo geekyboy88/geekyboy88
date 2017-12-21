@@ -1,0 +1,17 @@
+---
+title: Where to Park? Christmas TIme!
+author: geekyboy88
+date: '2017-12-24'
+slug: where-to-park-christmas-time
+categories: []
+tags: []
+---
+
+```{r}
+library(magrittr)
+library(jsonlite)
+library(dplyr)
+data = fromJSON("https://data.gov.sg/api/action/datastore_search?resource_id=139a3035-e624-4f56-b63f-89ae28d4ae4c&limit=5000")
+
+```
+

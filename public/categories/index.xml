@@ -1,30 +1,49 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Categories on Lithium Theme</title>
+    <title>Categories on geekyboy88</title>
     <link>/categories/</link>
-    <description>Recent content in Categories on Lithium Theme</description>
+    <description>Recent content in Categories on geekyboy88</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <lastBuildDate>Thu, 21 Dec 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/categories/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>Analytics</title>
+      <link>/categories/analytics/</link>
+      <pubDate>Thu, 21 Dec 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/analytics/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Mediacorp</title>
+      <link>/categories/mediacorp/</link>
+      <pubDate>Thu, 21 Dec 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/mediacorp/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>R</title>
       <link>/categories/r/</link>
-      <pubDate>Tue, 19 Dec 2017 21:13:14 -0500</pubDate>
+      <pubDate>Thu, 21 Dec 2017 00:00:00 +0000</pubDate>
       
       <guid>/categories/r/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>Soccer</title>
-      <link>/categories/soccer/</link>
-      <pubDate>Wed, 20 Dec 2017 00:00:00 +0000</pubDate>
+      <title>Text</title>
+      <link>/categories/text/</link>
+      <pubDate>Thu, 21 Dec 2017 00:00:00 +0000</pubDate>
       
-      <guid>/categories/soccer/</guid>
+      <guid>/categories/text/</guid>
       <description></description>
     </item>
     

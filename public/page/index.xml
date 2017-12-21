@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Pages on Lithium Theme</title>
+    <title>Pages on geekyboy88</title>
     <link>/page/</link>
-    <description>Recent content in Pages on Lithium Theme</description>
+    <description>Recent content in Pages on geekyboy88</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Thu, 05 May 2016 21:48:51 -0700</lastBuildDate>
@@ -17,7 +17,9 @@
       <pubDate>Thu, 05 May 2016 21:48:51 -0700</pubDate>
       
       <guid>/about/</guid>
-      <description>Lorem ipsum dolor sit amet.</description>
+      <description>Geeky Singaporean born in the dragon year.
+Interested in a myraid of topics relating to data analytics.
+Always keen to find out more. The more you learn the more you find yourself being humbled by things you do not know!</description>
     </item>
     
   </channel>

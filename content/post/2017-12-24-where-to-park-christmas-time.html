@@ -1,0 +1,23 @@
+---
+title: Where to Park? Christmas TIme!
+author: geekyboy88
+date: '2017-12-24'
+slug: where-to-park-christmas-time
+categories: []
+tags: []
+---
+
+
+
+<pre class="r"><code>library(magrittr)
+library(jsonlite)
+library(dplyr)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>data = fromJSON(&quot;https://data.gov.sg/api/action/datastore_search?resource_id=139a3035-e624-4f56-b63f-89ae28d4ae4c&amp;limit=5000&quot;)</code></pre>

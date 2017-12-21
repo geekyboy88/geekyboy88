@@ -3,13 +3,18 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>/2017/12/19/first-post/</loc>
-    <lastmod>2017-12-19T21:13:14-05:00</lastmod>
+    <loc>/2017/12/24/where-to-park-christmas-time/</loc>
+    <lastmod>2017-12-24T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/2017/12/20/unmarked-in-the-18-yard-box/</loc>
-    <lastmod>2017-12-20T00:00:00+00:00</lastmod>
+    <loc>/2017/12/21/when-duty-calls/</loc>
+    <lastmod>2017-12-21T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2017/12/19/first-post/</loc>
+    <lastmod>2017-12-19T21:13:14-05:00</lastmod>
   </url>
   
   <url>
@@ -18,19 +23,26 @@
   </url>
   
   <url>
+    <loc>/categories/analytics/</loc>
+    <lastmod>2017-12-21T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>/categories/</loc>
+    <lastmod>2017-12-21T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/chinasuperleague/</loc>
-    <lastmod>2017-12-20T00:00:00+00:00</lastmod>
+    <loc>/tags/mediacorp/</loc>
+    <lastmod>2017-12-21T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/</loc>
-    <lastmod>2017-12-19T21:13:14-05:00</lastmod>
+    <loc>/categories/mediacorp/</loc>
+    <lastmod>2017-12-21T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -48,13 +60,19 @@
   
   <url>
     <loc>/post/</loc>
-    <lastmod>2017-12-19T21:13:14-05:00</lastmod>
+    <lastmod>2017-12-24T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/r/</loc>
+    <lastmod>2017-12-21T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>/categories/r/</loc>
-    <lastmod>2017-12-19T21:13:14-05:00</lastmod>
+    <lastmod>2017-12-21T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -71,26 +89,26 @@
   </url>
   
   <url>
-    <loc>/tags/soccer/</loc>
-    <lastmod>2017-12-20T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>/categories/soccer/</loc>
-    <lastmod>2017-12-20T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>/tags/socceranalytics/</loc>
-    <lastmod>2017-12-20T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>/tags/</loc>
-    <lastmod>2017-12-20T00:00:00+00:00</lastmod>
+    <lastmod>2017-12-21T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/categories/text/</loc>
+    <lastmod>2017-12-21T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/textanalytics/</loc>
+    <lastmod>2017-12-21T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/</loc>
+    <lastmod>2017-12-24T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   

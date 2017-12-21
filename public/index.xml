@@ -1,15 +1,34 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Lithium Theme</title>
+    <title>geekyboy88</title>
     <link>/</link>
-    <description>Recent content on Lithium Theme</description>
+    <description>Recent content on geekyboy88</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 19 Dec 2017 21:13:14 -0500</lastBuildDate>
+    <lastBuildDate>Sun, 24 Dec 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Where to Park? Christmas TIme!</title>
+      <link>/2017/12/24/where-to-park-christmas-time/</link>
+      <pubDate>Sun, 24 Dec 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/12/24/where-to-park-christmas-time/</guid>
+      <description>library(magrittr) library(jsonlite) library(dplyr) ## ## Attaching package: &amp;#39;dplyr&amp;#39; ## The following objects are masked from &amp;#39;package:stats&amp;#39;: ## ## filter, lag ## The following objects are masked from &amp;#39;package:base&amp;#39;: ## ## intersect, setdiff, setequal, union data = fromJSON(&amp;quot;https://data.gov.sg/api/action/datastore_search?resource_id=139a3035-e624-4f56-b63f-89ae28d4ae4c&amp;amp;limit=5000&amp;quot;) </description>
+    </item>
+    
+    <item>
+      <title>When Duty Calls</title>
+      <link>/2017/12/21/when-duty-calls/</link>
+      <pubDate>Thu, 21 Dec 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/12/21/when-duty-calls/</guid>
+      <description>My first official post Alright. I realised that my first post wasn’t supposed to be online, so I had to remove it for good reasons. Anyhow, I’m still keen on getting my first official data science post up, so here we go!
+ Mediacorp Channel 8 Prime Time To start off, I need to introduce some facts about myself. I not too recently got married, got my own house, and my own television.</description>
+    </item>
     
     <item>
       <title>First Post</title>
@@ -23,21 +42,14 @@ Hope you will find this interesting! :)</description>
     </item>
     
     <item>
-      <title>Unmarked in the 18-yard box</title>
-      <link>/2017/12/20/unmarked-in-the-18-yard-box/</link>
-      <pubDate>Wed, 20 Dec 2017 00:00:00 +0000</pubDate>
-      
-      <guid>/2017/12/20/unmarked-in-the-18-yard-box/</guid>
-      <description>Soccer Analytics My very first data analytics post! I would like to dedicate my first post to a sport/hobby that I have really enjoyed since I was young, Soccer! I still recall the first ever match that I watched: Manchester United vs Liverpool in the 3rd round of the FA cup in United’s treble winning season. United were 1-0 down to a goal from Michael Owen, but scored 2 goals right at the death to move on to the 4th round.</description>
-    </item>
-    
-    <item>
       <title>About</title>
       <link>/about/</link>
       <pubDate>Thu, 05 May 2016 21:48:51 -0700</pubDate>
       
       <guid>/about/</guid>
-      <description>Lorem ipsum dolor sit amet.</description>
+      <description>Geeky Singaporean born in the dragon year.
+Interested in a myraid of topics relating to data analytics.
+Always keen to find out more. The more you learn the more you find yourself being humbled by things you do not know!</description>
     </item>
     
   </channel>
