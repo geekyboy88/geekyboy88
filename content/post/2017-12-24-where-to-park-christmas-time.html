@@ -9,25 +9,4 @@ tags: []
 
 
 
-<pre class="r"><code>library(magrittr)
-library(jsonlite)
-library(dplyr)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;dplyr&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:stats&#39;:
-## 
-##     filter, lag</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     intersect, setdiff, setequal, union</code></pre>
-<pre class="r"><code>library(ggmap)</code></pre>
-<pre><code>## Loading required package: ggplot2</code></pre>
-<pre><code>## 
-## Attaching package: &#39;ggmap&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:magrittr&#39;:
-## 
-##     inset</code></pre>
-<pre class="r"><code>rm(list=ls())
-data = fromJSON(&quot;https://data.gov.sg/api/action/datastore_search?resource_id=139a3035-e624-4f56-b63f-89ae28d4ae4c&amp;limit=4000&quot;)
 
-data = data$result$records</code></pre>

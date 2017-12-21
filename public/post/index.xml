@@ -17,7 +17,7 @@
       <pubDate>Sun, 24 Dec 2017 00:00:00 +0000</pubDate>
       
       <guid>/2017/12/24/where-to-park-christmas-time/</guid>
-      <description>library(magrittr) library(jsonlite) library(dplyr) ## ## Attaching package: &amp;#39;dplyr&amp;#39; ## The following objects are masked from &amp;#39;package:stats&amp;#39;: ## ## filter, lag ## The following objects are masked from &amp;#39;package:base&amp;#39;: ## ## intersect, setdiff, setequal, union library(ggmap) ## Loading required package: ggplot2 ## ## Attaching package: &amp;#39;ggmap&amp;#39; ## The following object is masked from &amp;#39;package:magrittr&amp;#39;: ## ## inset rm(list=ls()) data = fromJSON(&amp;quot;https://data.gov.sg/api/action/datastore_search?resource_id=139a3035-e624-4f56-b63f-89ae28d4ae4c&amp;amp;limit=4000&amp;quot;) data = data$result$records </description>
+      <description></description>
     </item>
     
     <item>

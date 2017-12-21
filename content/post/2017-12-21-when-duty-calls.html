@@ -16,46 +16,46 @@ tags:
 
 
 
-<div id="my-first-official-post" class="section level4">
-<h4>My first official post</h4>
+<div id="my-first-official-post" class="section level3">
+<h3>My first official post</h3>
 <p>Alright. I realised that my first post wasn’t supposed to be online, so I had to remove it for good reasons. Anyhow, I’m still keen on getting my first official data science post up, so here we go!</p>
 </div>
-<div id="mediacorp-channel-8-prime-time" class="section level4">
-<h4>Mediacorp Channel 8 Prime Time</h4>
+<div id="mediacorp-channel-8-prime-time" class="section level3">
+<h3>Mediacorp Channel 8 Prime Time</h3>
 <p>To start off, I need to introduce some facts about myself. I not too recently got married, got my own house, and my own <strong>television</strong>. This gave me quite a bit of freedom as to what I wanted to watch after I come home from work each day (<em>particularly as parents always have first choice on what show is screening on the family tv</em>).</p>
 <p>I must also admit that my mandarin isn’t particularly strong despite coming from a bilingual education system, given that <em>english</em> has always been the main form of communication in my life. Hence, to ensure that I do not lose sight of my mother tongue, I thought it would be good practice to spend some time watching TV shows in Chinese. Naturally, mediacorp’s <a href="https://tv.toggle.sg/en/channel8/">channel 8</a> 9pm prime time slot comes to mind (<em>as this is the time that I will definitely be home after work</em>)</p>
 </div>
-<div id="when-duty-calls" class="section level4">
-<h4>When Duty Calls</h4>
+<div id="when-duty-calls" class="section level3">
+<h3>When Duty Calls</h3>
 <p>So I got hooked at a time when they were showing <a href="https://video.toggle.sg/en/video/series/when-duty-calls/ep1/520403">When Duty Calls</a>, a show sponsored by MINDEF &amp; MHA to commemorate 50 years of national service. Honestly, I thought that the show provided quite a bit of entertainment value, and the idea of national service very easily resonates with majority of us Singaporeans.</p>
 </div>
-<div id="additional-entertainment-value" class="section level4">
-<h4>Additional entertainment value</h4>
+<div id="additional-entertainment-value" class="section level3">
+<h3>Additional entertainment value</h3>
 <p>However, beyond the show, I was also interested to find out what Singaporeans thought of this show. In this instance, one could think of no better source than HardwareZone’s EDMW. Soon, I found out that there is an official dedicated thread for this show. So I thought, why not put this thread through some data work and see what I could get!</p>
 </div>
-<div id="text-data" class="section level4">
-<h4>Text Data</h4>
+<div id="text-data" class="section level3">
+<h3>Text Data</h3>
 <p>The data that I collected were the individual posts, and the timing of these postings. If you are interested, the official link can be found <a href="http://forums.hardwarezone.com.sg/tv-mania-animemania-266/mediacorpse-50th-national-service-drama-5571280.html">here</a>.</p>
 </div>
-<div id="when-do-people-post" class="section level4">
-<h4>When do people post?</h4>
+<div id="when-do-people-post" class="section level3">
+<h3>When do people post?</h3>
 <p>The first thing I thought we would be interested to find out is: <strong>when do people post</strong>? From the chart below, we can see the huge cluster of posts that happen when the show starts. Well, this is not really surprising, as we find little reason for people to be on this hardwarezone thread at any other time of the day. We can also see that the number of comments start to pick up as we approach the end of the show, and slowly tapers off past 10pm-ish. Well, that’s about bedtime for most people, so I guess its appropriate that the number of posts go down too.</p>
 <p><img src="/post/2017-12-21-when-duty-calls_files/figure-html/readdata-1.png" width="672" /></p>
 </div>
-<div id="advertisement-breaks" class="section level4">
-<h4>Advertisement Breaks</h4>
+<div id="advertisement-breaks" class="section level3">
+<h3>Advertisement Breaks</h3>
 <p>For easier viewing, I also have a zoomed-in version of the number of posts by time starting from just before the show starts to just after it ends. The zoomed-in version provides an additional interesting analysis. <strong>Can you spot when the advertisement breaks are?</strong></p>
 <p><img src="/post/2017-12-21-when-duty-calls_files/figure-html/advert-1.png" width="672" /></p>
 </div>
-<div id="popular-actor-actresses" class="section level4">
-<h4>Popular Actor / Actresses?</h4>
+<div id="popular-actor-actresses" class="section level3">
+<h3>Popular Actor / Actresses?</h3>
 <p>If you had taken a look at the wikipedia link that I had shared above, you would likely to have noticed that the cast of this TV show is relatively solid. But us as humans also have a tendency to pick our favorites, and I would suppose that in our conversations with others about the show, it is natural for us to talk more frequently about our favourite cast. Aggregated across an entire community, we can then find out which of the cast members is the fan favourite!</p>
 <p>Make a guess? Who amongst the cast members do you think would be the most popular? (<em>Do not peek!</em>)</p>
 <p><img src="/post/2017-12-21-when-duty-calls_files/figure-html/pops-1.png" width="672" /></p>
 <p>Well, I’m sure there’s nothing stopping you from scrolling down to take a look. Anyhow, if you follow the local media scene, I’m sure you would be rougly familiar with <a href="https://en.wikipedia.org/wiki/Paige_Chua">Paige Chua</a>, who has come in top as our fan favourite cast member for “When Duty Calls”. Following close behind is <a href="https://en.wikipedia.org/wiki/Desmond_Tan/">Desmond Tan</a>, who (as I just read from Wikipedia) has a fan club called <strong>Destanation</strong> and is considered one of the 8 <strong>Dukes</strong> of Mediacorp. <a href="https://en.wikipedia.org/wiki/Pierre_Png">Pierre Png</a>, well you all should know who he is right. He came in third.</p>
 </div>
-<div id="wordcloud" class="section level4">
-<h4>WordCloud</h4>
+<div id="wordcloud" class="section level3">
+<h3>WordCloud</h3>
 <p>Lastly, I thought it would also be interesting to find out which are the most commonly words that are used in the thread. What I did was to parse each post (<em>usually in sentences or at least phrases</em>) into words, following which, for each word, I counted the number of occurances of each word, and summed up across the entire thread. As I am typing this, I realise I should have explained this earlier when finding out who the most popular cast member was, but I’m a little too lazy to backtrack, so… nevermind!</p>
 <p>In the word cloud, the size of the word reflects the number of occurances of that particular word, i.e. the <strong>larger</strong> the word, the more frequently it was used. I wouldn’t be spending time to talk much about the wordcloud. I think that it is rather self-explanatory, and I hope you have a good laugh when you encounter some “familiar” words :).</p>
 <p><img src="/post/2017-12-21-when-duty-calls_files/figure-html/wordcloud-1.png" width="1152" /></p>
