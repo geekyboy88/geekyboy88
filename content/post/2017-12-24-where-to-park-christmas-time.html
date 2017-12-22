@@ -1,12 +1,42 @@
 ---
-title: Where to Park? Christmas Time!
+title: It's Parking Time!
 author: geekyboy88
 date: '2017-12-24'
-slug: where-to-park-christmas-time
+slug: its-parking-time
+output:
+  html_document:
+    toc: true
 categories: []
 tags: []
 ---
 
 
 
-
+<div id="open-data-in-singapore" class="section level3">
+<h3>Open Data in Singapore</h3>
+<p>Hi again! For my second post, I would like to focus on exploring the open data sources available at <a href="https://www.data.gov.sg/">data.gov.sg</a>. But should one click on the link that I just provided and take a look at the available data sources, one would find an immense number of data sets available, and wouldn’t necessarily know where to begin!</p>
+</div>
+<div id="holiday-season" class="section level3">
+<h3>Holiday Season!</h3>
+<p>As we approach the festive season, with Christmas, New Year, and Chinese New Year coming in the following months,</p>
+</div>
+<div id="load-packages" class="section level3">
+<h3>Load Packages</h3>
+<p>First</p>
+<hr />
+<pre class="r"><code>library(magrittr)
+library(jsonlite)
+library(dplyr)
+library(ggmap)</code></pre>
+<pre class="r"><code>library(MASS)
+data(cats)
+plot(Hwt ~ Bwt, data=cats, xlab=&quot;Body weight (kg)&quot;, ylab=&quot;Heart weight (g)&quot;)</code></pre>
+<p><img src="/post/2017-12-24-where-to-park-christmas-time_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+</div>
+<div id="reading-in-the-data" class="section level3">
+<h3>Reading in the Data</h3>
+<p>Next, let’s read in the data into our working environment using the provided <strong>API Key</strong>.</p>
+<pre class="r"><code>data = fromJSON(&quot;https://data.gov.sg/api/action/datastore_search?resource_id=139a3035-e624-4f56-b63f-89ae28d4ae4c&amp;limit=4000&quot;)
+data = data$result$records</code></pre>
+<p><em>Note: This post contains information on <a href="https://data.gov.sg/dataset/hdb-carpark-information?view_id=398e65ae-e2cb-4312-8651-6e65d6f19ed1&amp;resource_id=139a3035-e624-4f56-b63f-89ae28d4ae4c">HDB Carpark Information</a> accessed <a href="https://www.google.com.sg/search?q=today%27s+date&amp;oq=today%27s+date&amp;aqs=chrome..69i57.1121j0j7&amp;sourceid=chrome&amp;ie=UTF-8">today’s date</a> which is made available under the terms of the <a href="https://data.gov.sg/open-data-licence">Singapore Open Data Licence version 1.0</a>.</em></p>
+</div>

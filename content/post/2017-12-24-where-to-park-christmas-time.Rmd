@@ -1,22 +1,51 @@
 ---
-title: Where to Park? Christmas Time!
+title: It's Parking Time!
 author: geekyboy88
 date: '2017-12-24'
-slug: where-to-park-christmas-time
+slug: its-parking-time
+output:
+  html_document:
+    toc: true
 categories: []
 tags: []
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(warning=FALSE, echo=FALSE, comment=NA, message=FALSE)
+knitr::opts_chunk$set(warning=FALSE, comment=NA, message=FALSE)
 ```
 
-```{r}
+### Open Data in Singapore
+
+Hi again! For my second post, I would like to focus on exploring the open data sources available at [data.gov.sg](https://www.data.gov.sg/). But should one click on the link that I just provided and take a look at the available data sources, one would find an immense number of data sets available, and wouldn't necessarily know where to begin!
+
+### Holiday Season!
+
+As we approach the festive season, with Christmas, New Year, and Chinese New Year coming in the following months, 
+
+### Load Packages
+
+First 
+
+---
+```{r loadpackages, results='asis'}
 library(magrittr)
 library(jsonlite)
 library(dplyr)
 library(ggmap)
-rm(list=ls())
+```
+
+
+```{r}
+library(MASS)
+data(cats)
+plot(Hwt ~ Bwt, data=cats, xlab="Body weight (kg)", ylab="Heart weight (g)")
+```
+
+### Reading in the Data
+
+Next, let's read in the data into our working environment using the provided __API Key__.
+
+```{r readdata, echo = T}
 data = fromJSON("https://data.gov.sg/api/action/datastore_search?resource_id=139a3035-e624-4f56-b63f-89ae28d4ae4c&limit=4000")
 data = data$result$records
 
@@ -24,3 +53,13 @@ data = data$result$records
 
 ```
 
+
+
+
+
+
+
+
+
+
+_Note: This post contains information on [HDB Carpark Information](https://data.gov.sg/dataset/hdb-carpark-information?view_id=398e65ae-e2cb-4312-8651-6e65d6f19ed1&resource_id=139a3035-e624-4f56-b63f-89ae28d4ae4c) accessed [today's date](https://www.google.com.sg/search?q=today%27s+date&oq=today%27s+date&aqs=chrome..69i57.1121j0j7&sourceid=chrome&ie=UTF-8) which is made available under the terms of the [Singapore Open Data Licence version 1.0](https://data.gov.sg/open-data-licence)._

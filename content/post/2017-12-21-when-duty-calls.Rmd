@@ -157,7 +157,7 @@ Lastly, I thought it would also be interesting to find out which are the most co
 
 In the word cloud, the size of the word reflects the number of occurances of that particular word, i.e. the __larger__ the word, the more frequently it was used. I wouldn't be spending time to talk much about the wordcloud. I think that it is rather self-explanatory, and I hope you have a good laugh when you encounter some "familiar" words :).
 
-```{r wordcloud, fig.width=12, fig.height=8}
+```{r wordcloud}
 meta1 = wcm1 %>% as.matrix() %>% as.data.frame()
 meta1$total_count = rowSums(meta1)
 pal2 <- brewer.pal(8,"Dark2")
