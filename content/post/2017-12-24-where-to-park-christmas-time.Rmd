@@ -28,11 +28,13 @@ library(ggmap)
 
 ### Reading in the Data
 
-Next, let's read in the data into our working environment using the provided __API Key__.
+Next, let's read in the data into our working environment using the provided __API Key__. After we read in the data (_in JSON format_), we realise that the API provides data, as well as the metadata of the dataset. In this case, because we are only interested in the records, we will only keep these.
 
 ```{r readdata, echo = T, message=FALSE, warning=FALSE}
-data = fromJSON("https://data.gov.sg/api/action/datastore_search?resource_id=139a3035-e624-4f56-b63f-89ae28d4ae4c&limit=4000")
+data = fromJSON("https://data.gov.sg/api/action/datastore_search?resource_id=139a3035-e624-4f56-b63f-89ae28d4ae4c")
 data = data$result$records
+
+
 
 
 
