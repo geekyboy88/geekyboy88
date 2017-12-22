@@ -2,17 +2,10 @@
 title: It's Parking Time!
 author: geekyboy88
 date: '2017-12-24'
-slug: its-parking-time
-output:
-  html_document:
-    toc: true
+output: html_document
 categories: []
 tags: []
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(warning=FALSE, comment=NA, message=FALSE)
-```
 
 ### Open Data in Singapore
 
@@ -24,28 +17,20 @@ As we approach the festive season, with Christmas, New Year, and Chinese New Yea
 
 ### Load Packages
 
-First 
+First, let's load some package that we will need.
 
----
-```{r loadpackages, results='asis'}
+```{r loadpackages, message=FALSE, warning=FALSE}
 library(magrittr)
 library(jsonlite)
 library(dplyr)
 library(ggmap)
 ```
 
-
-```{r}
-library(MASS)
-data(cats)
-plot(Hwt ~ Bwt, data=cats, xlab="Body weight (kg)", ylab="Heart weight (g)")
-```
-
 ### Reading in the Data
 
 Next, let's read in the data into our working environment using the provided __API Key__.
 
-```{r readdata, echo = T}
+```{r readdata, echo = T, message=FALSE, warning=FALSE}
 data = fromJSON("https://data.gov.sg/api/action/datastore_search?resource_id=139a3035-e624-4f56-b63f-89ae28d4ae4c&limit=4000")
 data = data$result$records
 
@@ -57,7 +42,9 @@ data = data$result$records
 
 
 
+#### CURRENTLY UNDER CONSTRUCTION
 
+_Stay Tune_!
 
 
 
