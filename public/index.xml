@@ -5,52 +5,60 @@
     <link>/</link>
     <description>Recent content on geekyboy88</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language>
-    <lastBuildDate>Sun, 24 Dec 2017 00:00:00 +0000</lastBuildDate>
+    <managingEditor>kennethang7@gmail.com (Kenneth)</managingEditor>
+    <webMaster>kennethang7@gmail.com (Kenneth)</webMaster>
+    <lastBuildDate>Sun, 07 Jan 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>Soccer and Anger Management</title>
+      <link>/post/soccer-and-anger-management/</link>
+      <pubDate>Sun, 07 Jan 2018 00:00:00 +0000</pubDate>
+      <author>kennethang7@gmail.com (Kenneth)</author>
+      <guid>/post/soccer-and-anger-management/</guid>
+      <description>body, td { font-size: 14px; } code.r{ font-size: 14px; } pre { font-size: 14px }  Soccer and Anger Management Hi everyone again. For my third post, I have decided to look at some soccer data that was recently uploaded at Kaggle. This is a mega dataset comprising close to 900k records of events across a number of major European leagues over the course of about 5 seasons. The great thing about events data is that it gives you a really intricate flavour of what happens in the match.</description>
+    </item>
+    
+    <item>
       <title>It&#39;s Parking Time!</title>
-      <link>/2017/12/24/its-parking-time/</link>
+      <link>/post/2018-01-08-it-s-parking-time/</link>
       <pubDate>Sun, 24 Dec 2017 00:00:00 +0000</pubDate>
-      
-      <guid>/2017/12/24/its-parking-time/</guid>
-      <description>Open Data in Singapore Hi again! For my second post, I would like to focus on exploring the open data sources available at data.gov.sg. But should one click on the link that I just provided and take a look at the available data sources, one would find an immense number of data sets available, and wouldn’t necessarily know where to begin!
- Holiday Season! As we approach the festive season, with Christmas, New Year, and Chinese New Year coming in the following months,</description>
+      <author>kennethang7@gmail.com (Kenneth)</author>
+      <guid>/post/2018-01-08-it-s-parking-time/</guid>
+      <description>body, td { font-size: 14px; } code.r{ font-size: 14px; } pre { font-size: 14px }  Open Data in Singapore Hi again! For my second post, I would like to focus on exploring the open data sources available at data.gov.sg. But should one click on the link that I just provided and take a look at the available data sources, one would find an immense number of data sets available, and wouldn’t necessarily know where to begin!</description>
     </item>
     
     <item>
       <title>When Duty Calls</title>
-      <link>/2017/12/21/when-duty-calls/</link>
+      <link>/post/when-duty-calls/</link>
       <pubDate>Thu, 21 Dec 2017 00:00:00 +0000</pubDate>
-      
-      <guid>/2017/12/21/when-duty-calls/</guid>
+      <author>kennethang7@gmail.com (Kenneth)</author>
+      <guid>/post/when-duty-calls/</guid>
       <description>My first official post Alright. I realised that my first post wasn’t supposed to be online, so I had to remove it for good reasons. Anyhow, I’m still keen on getting my first official data science post up, so here we go!
  Mediacorp Channel 8 Prime Time To start off, I need to introduce some facts about myself. I not too recently got married, got my own house, and my own television.</description>
     </item>
     
     <item>
       <title>First Post</title>
-      <link>/2017/12/19/first-post/</link>
+      <link>/post/2017-12-19-first-post/</link>
       <pubDate>Tue, 19 Dec 2017 21:13:14 -0500</pubDate>
-      
-      <guid>/2017/12/19/first-post/</guid>
+      <author>kennethang7@gmail.com (Kenneth)</author>
+      <guid>/post/2017-12-19-first-post/</guid>
       <description>Hi everyone, this is my first blog post here.
 I enjoy working on data, and will be starting to post some of my work here.
 Hope you will find this interesting! :)</description>
     </item>
     
     <item>
-      <title>About</title>
-      <link>/about/</link>
-      <pubDate>Thu, 05 May 2016 21:48:51 -0700</pubDate>
-      
-      <guid>/about/</guid>
-      <description>Geeky Singaporean born in the dragon year.
-Interested in a myraid of topics relating to data analytics.
-Always keen to find out more. The more you learn the more you find yourself being humbled by things you do not know!</description>
+      <title>About myself</title>
+      <link>/page/about/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <author>kennethang7@gmail.com (Kenneth)</author>
+      <guid>/page/about/</guid>
+      <description>Hi! My name is Kenneth, and I am a Singaporean who really loves working with data. I&amp;rsquo;m starting this blog to share some of stuff that I have done in the data space!
+Cheers!</description>
     </item>
     
   </channel>

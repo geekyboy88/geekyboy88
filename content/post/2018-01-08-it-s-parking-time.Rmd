@@ -1,0 +1,130 @@
+---
+title: It's Parking Time!
+author: geekyboy88
+date: '2017-12-24'
+categories: []
+tags: []
+---
+
+<style type="text/css">
+
+body, td {
+   font-size: 14px;
+}
+code.r{
+  font-size: 14px;
+}
+pre {
+  font-size: 14px
+}
+</style>
+
+### Open Data in Singapore
+
+Hi again! For my second post, I would like to focus on exploring the open data sources available at [data.gov.sg](https://www.data.gov.sg/). But should one click on the link that I just provided and take a look at the available data sources, one would find an immense number of data sets available, and wouldn't necessarily know where to begin!
+
+### Holiday Season!
+
+I thought, as we approach the festive season, with Christmas, New Year, and Chinese New Year coming in the following months, a good place to start would be the HDB Carparks dataset. Given that close to 80% of Singapore residents live in HDB flat, it is quite likely that you will be visiting one of your many relatives there. For those of you who are driving, you may be interested to find out where you can get free parking, etc.
+
+### Load Packages
+
+First, let's load some package that we will need.
+
+```{r loadpackages, message=FALSE, warning=FALSE}
+library(magrittr)
+library(jsonlite)
+library(knitr)
+library(knitr)
+library(maptools)
+library(proj4)
+library(dplyr)
+library(ggmap)
+library(sp)
+library(scales)
+library(rgdal)
+library(rgeos)
+```
+
+### Reading in the Data
+
+Next, let's read in the data into our working environment using the provided __API Key__. After we read in the data (_in JSON format_), we realise that the API provides data, as well as the metadata of the dataset. However, we will only keep the actual dataset because that is what we are interested in. 
+
+```{r readdata, echo = T, message=FALSE, warning=FALSE}
+data = fromJSON("https://data.gov.sg/api/action/datastore_search?resource_id=139a3035-e624-4f56-b63f-89ae28d4ae4c&limit=2502")
+data = data$result$records
+```
+
+### Exploring the dataset
+
+Let's explore this dataset further. Taking a look below, we can see a total of 10 data fields, which gives us information of the address and location of the carpark, what type of carpark it is, the type of parking system, and whether you can park there for free or during the night. In total, there are 2052 HDB carparks as at the date of this post.
+
+```{r exploredata, echo=F, message=NA}
+knitr::kable(head(data))
+nrow(data)
+```
+
+## Where are the locations of the carparks?
+
+For a start, let’s try to locate where most of these car parks are. But before we do so, there’s a bit of data cleaning that we will n eed to do. Firstly, the data is provided in X and Y coordinates, and somehow R reads these coordiantes as __characters__ rather than as __numerics__. So what we need to do is to convert them into numerics and subsequently run the reverse geocode to obtain the equivalent latitude and longitude values for each corresponding X and Y coordinates. To do so, I used the R package (_proj4_) to run the projection.
+
+```{r location}
+data$x_coord %<>% as.numeric()
+data$y_coord %<>% as.numeric()
+
+geo = read.csv("../../static/data/geo.csv", stringsAsFactors = F)
+data %<>% cbind(geo[,c(2:3)])
+rm(geo)
+```
+
+With that done, let’s take a look at all the HDB car park locations in Singapore. The colour of the dots represent the type of parking system, 1) Red for coupon parking, and 2) Blue for electronic parking. In any case, this just gives us a broad overview that most of our car parks systems are electronic, and if you are visiting relatives in the Jurong, Tampines or Pasir Ris regions, and you do not have any car park coupons on hand, you are unlikely to be in trouble.
+
+```{r location1}
+wmap = get_map(location = "Singapore", zoom = 11, maptype = "terrain", source = "google")
+ggmap(wmap) +
+  geom_point(aes(x = long, y = lat, colour = type_of_parking_system), data = data, size = 1) +
+  labs(colour = "Type of Parking System", x = "Longitude", y = "Latitude") +
+  theme(legend.position = "bottom")
+```
+
+### Free Parking!
+
+Let’s move on to something more interesting, which is free parking! (_because I am pretty sure Singaporeans are typically on a hunt to save money when they can_). From the chart below, we can see that majority of the carparks allow for free parking during the day, while the rest do not have any allowances for free parking. Interestingly, there is a small percentage that allows for free parking in the afternoon hours but not in the AM.
+
+```{r freeparking}
+data %>%
+  mutate(Group = factor(free_parking, levels = c("NO","SUN & PH FR 1PM-10.30PM","SUN & PH FR 7AM-10.30PM"))) %>%
+  group_by(Group) %>%
+  summarise(count = n()) %>%
+  mutate(cumulative = cumsum(count),
+         midpoint = 2052 - (cumulative - count/2)) %>%
+  ggplot(aes(x = "", y = count, fill = Group)) +
+  geom_bar(stat ="identity") +
+  coord_polar("y", start = 0) +
+  geom_text(aes(y = midpoint, 
+            label = percent(count/2052)), size=5) +
+  labs(fill = "Free Parking Hours", x = "", y = "", title = "Proportion of HDB Carparks by Free Parking Hours")
+```
+
+Next, I tried to identify clusters where there are no free parking. From the chart below, we can find a few key clusters: 1) Punggol waterway, 2) Changi Village, 3) Rochor and 4) Marine Parade. If you have any relatives who would like to offer their houses for visiting during this festive season, you may wish to counter suggest, otherwise, you would have lesser cash on hand to play __Mahjong__ or __Ban Luck__!
+
+```{r freeparking1}
+ggmap(wmap) +
+  geom_point(aes(x = long, y = lat, colour = free_parking, alpha = 0.3), data = data, size = 1) +
+  labs(colour = "Free Parking Hours", x = "Longitude", y = "Latitude") +
+  theme(legend.position = "bottom")
+```
+
+### Bring Umbrella?
+
+Another interesting data field in this dataset tells us what type of car park it is. For those of you who have been living in Singapore, you may be familiar with the many different type of car parks out there, i.e. surface, multi-storey, etc. The HDB carparks come in two main shapes, 1) surface carparks, or 2) multi-storey carparks. As you may also note from the table below, we have quite some way to go towards having mechanised car park systems.
+
+```{r umbrella}
+data %>%
+  group_by(car_park_type) %>%
+  summarise(Number_of_Carparks = n())
+```
+
+
+
+_Note: This post contains information on [HDB Carpark Information](https://data.gov.sg/dataset/hdb-carpark-information?view_id=398e65ae-e2cb-4312-8651-6e65d6f19ed1&resource_id=139a3035-e624-4f56-b63f-89ae28d4ae4c) accessed [today's date](https://www.google.com.sg/search?q=today%27s+date&oq=today%27s+date&aqs=chrome..69i57.1121j0j7&sourceid=chrome&ie=UTF-8) which is made available under the terms of the [Singapore Open Data Licence version 1.0](https://data.gov.sg/open-data-licence)._

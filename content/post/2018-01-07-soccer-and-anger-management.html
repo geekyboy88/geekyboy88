@@ -1,0 +1,518 @@
+---
+title: Soccer and Anger Management
+author: geekyboy88
+date: '2018-01-07'
+slug: soccer-and-anger-management
+categories:
+  - R
+  - soccer
+  - Analytics
+tags:
+  - R
+  - R Markdown
+  - soccer
+  - analytics
+---
+
+
+
+<style type="text/css">
+
+body, td {
+   font-size: 14px;
+}
+code.r{
+  font-size: 14px;
+}
+pre {
+  font-size: 14px
+}
+</style>
+<div id="soccer-and-anger-management" class="section level3">
+<h3>Soccer and Anger Management</h3>
+<p>Hi everyone again. For my third post, I have decided to look at some soccer data that was recently uploaded at Kaggle. This is a mega dataset comprising close to 900k records of events across a number of major European leagues over the course of about 5 seasons. The <strong>great</strong> thing about events data is that it gives you a really intricate flavour of what happens in the match.</p>
+<div id="packages" class="section level4">
+<h4>Packages</h4>
+<p>Again, let’s start off with the basic steps of loading the required packages.</p>
+<pre class="r"><code>library(magrittr)
+library(RColorBrewer)
+library(ggplot2)
+library(knitr)
+library(dplyr)</code></pre>
+</div>
+<div id="data" class="section level4">
+<h4>Data</h4>
+<p>After loading in the dataset, let’s have a quick look at the information that each dataset contains.</p>
+<p>First, we’ll take a look at the events information.</p>
+<pre class="r"><code>events = read.csv(&quot;../../static/data/events1.csv&quot;, stringsAsFactors = F)
+ginf = read.csv(&quot;../../static/data/ginf.csv&quot;, stringsAsFactors = F)
+
+knitr::kable(head(events))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">X</th>
+<th align="left">id_odsp</th>
+<th align="left">id_event</th>
+<th align="right">sort_order</th>
+<th align="right">time</th>
+<th align="left">text</th>
+<th align="right">event_type</th>
+<th align="right">event_type2</th>
+<th align="right">side</th>
+<th align="left">event_team</th>
+<th align="left">opponent</th>
+<th align="left">player</th>
+<th align="left">player2</th>
+<th align="left">player_in</th>
+<th align="left">player_out</th>
+<th align="right">shot_place</th>
+<th align="right">shot_outcome</th>
+<th align="right">is_goal</th>
+<th align="right">location</th>
+<th align="right">bodypart</th>
+<th align="right">assist_method</th>
+<th align="right">situation</th>
+<th align="right">fast_break</th>
+<th align="left">date</th>
+<th align="left">league</th>
+<th align="right">season</th>
+<th align="left">country</th>
+<th align="left">ht</th>
+<th align="left">at</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="left">0ABxtTSC/</td>
+<td align="left">0ABxtTSC1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">Arouna Kone (Everton) wins a free kick in the defensive half.</td>
+<td align="right">8</td>
+<td align="right">NA</td>
+<td align="right">2</td>
+<td align="left">Everton</td>
+<td align="left">Tottenham</td>
+<td align="left">arouna kone</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">NA</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="right">0</td>
+<td align="left">2015-08-29</td>
+<td align="left">E0</td>
+<td align="right">2016</td>
+<td align="left">england</td>
+<td align="left">Tottenham</td>
+<td align="left">Everton</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="left">0ABxtTSC/</td>
+<td align="left">0ABxtTSC2</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="left">Foul by Danny Rose (Tottenham Hotspur).</td>
+<td align="right">3</td>
+<td align="right">NA</td>
+<td align="right">1</td>
+<td align="left">Tottenham</td>
+<td align="left">Everton</td>
+<td align="left">danny rose</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="right">0</td>
+<td align="left">2015-08-29</td>
+<td align="left">E0</td>
+<td align="right">2016</td>
+<td align="left">england</td>
+<td align="left">Tottenham</td>
+<td align="left">Everton</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="left">0ABxtTSC/</td>
+<td align="left">0ABxtTSC3</td>
+<td align="right">3</td>
+<td align="right">5</td>
+<td align="left">Attempt blocked. Eric Dier (Tottenham Hotspur) left footed shot from outside the box is blocked. Assisted by Ryan Mason.</td>
+<td align="right">1</td>
+<td align="right">12</td>
+<td align="right">1</td>
+<td align="left">Tottenham</td>
+<td align="left">Everton</td>
+<td align="left">eric dier</td>
+<td align="left">ryan mason</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">15</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="left">2015-08-29</td>
+<td align="left">E0</td>
+<td align="right">2016</td>
+<td align="left">england</td>
+<td align="left">Tottenham</td>
+<td align="left">Everton</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="left">0ABxtTSC/</td>
+<td align="left">0ABxtTSC4</td>
+<td align="right">4</td>
+<td align="right">8</td>
+<td align="left">Ross Barkley (Everton) wins a free kick in the defensive half.</td>
+<td align="right">8</td>
+<td align="right">NA</td>
+<td align="right">2</td>
+<td align="left">Everton</td>
+<td align="left">Tottenham</td>
+<td align="left">ross barkley</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">NA</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="right">0</td>
+<td align="left">2015-08-29</td>
+<td align="left">E0</td>
+<td align="right">2016</td>
+<td align="left">england</td>
+<td align="left">Tottenham</td>
+<td align="left">Everton</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="left">0ABxtTSC/</td>
+<td align="left">0ABxtTSC5</td>
+<td align="right">5</td>
+<td align="right">8</td>
+<td align="left">Foul by Eric Dier (Tottenham Hotspur).</td>
+<td align="right">3</td>
+<td align="right">NA</td>
+<td align="right">1</td>
+<td align="left">Tottenham</td>
+<td align="left">Everton</td>
+<td align="left">eric dier</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="right">0</td>
+<td align="left">2015-08-29</td>
+<td align="left">E0</td>
+<td align="right">2016</td>
+<td align="left">england</td>
+<td align="left">Tottenham</td>
+<td align="left">Everton</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="left">0ABxtTSC/</td>
+<td align="left">0ABxtTSC6</td>
+<td align="right">6</td>
+<td align="right">10</td>
+<td align="left">Attempt missed. Harry Kane (Tottenham Hotspur) right footed shot from outside the box misses to the left. Assisted by Mousa Dembele.</td>
+<td align="right">1</td>
+<td align="right">12</td>
+<td align="right">1</td>
+<td align="left">Tottenham</td>
+<td align="left">Everton</td>
+<td align="left">harry kane</td>
+<td align="left">mousa dembele</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="right">8</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">15</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="left">2015-08-29</td>
+<td align="left">E0</td>
+<td align="right">2016</td>
+<td align="left">england</td>
+<td align="left">Tottenham</td>
+<td align="left">Everton</td>
+</tr>
+</tbody>
+</table>
+<p>And next, we’ll look at the data available in the matches dataset.</p>
+<pre class="r"><code>knitr::kable(head(ginf))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">id_odsp</th>
+<th align="left">link_odsp</th>
+<th align="left">adv_stats</th>
+<th align="left">date</th>
+<th align="left">league</th>
+<th align="right">season</th>
+<th align="left">country</th>
+<th align="left">ht</th>
+<th align="left">at</th>
+<th align="right">fthg</th>
+<th align="right">ftag</th>
+<th align="right">odd_h</th>
+<th align="right">odd_d</th>
+<th align="right">odd_a</th>
+<th align="right">odd_over</th>
+<th align="right">odd_under</th>
+<th align="right">odd_bts</th>
+<th align="right">odd_bts_n</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">UFot0hit/</td>
+<td align="left">/soccer/germany/bundesliga-2011-2012/dortmund-hamburger-UFot0hit/</td>
+<td align="left">TRUE</td>
+<td align="left">2011-08-05</td>
+<td align="left">D1</td>
+<td align="right">2012</td>
+<td align="left">germany</td>
+<td align="left">Borussia Dortmund</td>
+<td align="left">Hamburg SV</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td align="right">1.56</td>
+<td align="right">4.41</td>
+<td align="right">7.42</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">Aw5DflLH/</td>
+<td align="left">/soccer/germany/bundesliga-2011-2012/augsburg-freiburg-Aw5DflLH/</td>
+<td align="left">TRUE</td>
+<td align="left">2011-08-06</td>
+<td align="left">D1</td>
+<td align="right">2012</td>
+<td align="left">germany</td>
+<td align="left">FC Augsburg</td>
+<td align="left">SC Freiburg</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">2.36</td>
+<td align="right">3.60</td>
+<td align="right">3.40</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">bkjpaC6n/</td>
+<td align="left">/soccer/germany/bundesliga-2011-2012/werder-bremen-kaiserslautern-bkjpaC6n/</td>
+<td align="left">TRUE</td>
+<td align="left">2011-08-06</td>
+<td align="left">D1</td>
+<td align="right">2012</td>
+<td align="left">germany</td>
+<td align="left">Werder Bremen</td>
+<td align="left">Kaiserslautern</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">1.83</td>
+<td align="right">4.20</td>
+<td align="right">4.80</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">CzPV312a/</td>
+<td align="left">/soccer/france/ligue-1-2011-2012/paris-sg-lorient-CzPV312a/</td>
+<td align="left">TRUE</td>
+<td align="left">2011-08-06</td>
+<td align="left">F1</td>
+<td align="right">2012</td>
+<td align="left">france</td>
+<td align="left">Paris Saint-Germain</td>
+<td align="left">Lorient</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1.55</td>
+<td align="right">4.50</td>
+<td align="right">9.40</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">GUOdmtII/</td>
+<td align="left">/soccer/france/ligue-1-2011-2012/caen-valenciennes-GUOdmtII/</td>
+<td align="left">TRUE</td>
+<td align="left">2011-08-06</td>
+<td align="left">F1</td>
+<td align="right">2012</td>
+<td align="left">france</td>
+<td align="left">Caen</td>
+<td align="left">Valenciennes</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">2.50</td>
+<td align="right">3.40</td>
+<td align="right">3.45</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">lOpzwMkp/</td>
+<td align="left">/soccer/germany/bundesliga-2011-2012/hertha-berlin-nurnberg-lOpzwMkp/</td>
+<td align="left">TRUE</td>
+<td align="left">2011-08-06</td>
+<td align="left">D1</td>
+<td align="right">2012</td>
+<td align="left">germany</td>
+<td align="left">Hertha Berlin</td>
+<td align="left">Nurnberg</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2.06</td>
+<td align="right">3.75</td>
+<td align="right">3.95</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<p>Since its my first time working on this dataset, I’ll focus only on the English Premier League (EPL), just because it is the most watched league in Singapore. What I did was to first merge in the match information to the events data, and subsequently filter only for events that happened during EPL matches. Also, since we aren’t doing comparisons across leagues, I have also filtered down to the 2015/2016 season (<em>yes, that season when Leicester City shocked? the world by becoming EPL champions</em>).</p>
+<pre class="r"><code>events %&lt;&gt;% merge(ginf[,c(1, 4:9)], by = &quot;id_odsp&quot;, all.x = T)
+rm(ginf)</code></pre>
+</div>
+</div>
+<div id="disciplinary-records" class="section level3">
+<h3>Disciplinary Records</h3>
+<p>For my first post, I wanted to focus on the other side of soccer that is typically not talked about as often. Typically, any commentary or analysis about soccer looks at <strong>goals</strong> and/or <strong>goal chances</strong>, and the disciplinary side of things tend to be overlooked. However, I believe that there are interesting insights that can be taken away, as <em>red cards</em>, <em>yellow cards</em>, or <em>fouls</em> have the potential to be <strong>game-changing</strong> moments in the match.</p>
+<p>For a start, let’s attempt to find out which of these EPL teams tend to have the best / worst discplinary records.</p>
+<pre class="r"><code>events %&lt;&gt;%
+  filter(event_type == 4 | event_type == 6 | event_type == 3) %&gt;%
+  mutate(event_type = ifelse(event_type == 4, &quot;Yellow Card&quot;,
+                      ifelse(event_type == 6, &quot;Red Card&quot;, &quot;Foul&quot;)))</code></pre>
+</div>
+<div id="fouls" class="section level3">
+<h3>Fouls</h3>
+<p>We start off by looking at the teams with the most fouls. <em>Well well well</em>, no surprise to see here that <strong>Manchester United</strong> is top of the fouls league (<em>given the over-emphasis of breaking up play rather than making play in that season under Louis Van Gaal</em>). Following closely behind is <strong>Crystal Palace</strong>, <strong>Tottenham Hotspur</strong> and <strong>Watford</strong>. At the other end of the table, we see that <strong>Everton</strong> is the “<em>cleanest</em>” team with less than 300 fouls across the entire season.</p>
+<pre class="r"><code>events %&gt;%
+  filter(event_type == &quot;Foul&quot;) %&gt;%
+  group_by(event_team) %&gt;%
+  summarise(num = n()) %&gt;%
+  ggplot(aes(x = reorder(event_team, num), y = num, fill = num)) +
+  geom_bar(position = position_dodge(), stat =&quot;identity&quot;) +
+  scale_fill_gradient(low = &quot;magenta1&quot;, high = &quot;maroon&quot;) +
+  theme_classic() +
+  theme(legend.position = &quot;none&quot;) +
+  labs(x = &quot;EPL team&quot;, y = &quot;Number of Fouls&quot;, title = &quot;Number of Fouls by EPL Teams&quot;) +
+  coord_flip()</code></pre>
+<p><img src="/post/2018-01-07-soccer-and-anger-management_files/figure-html/fouls-1.png" width="672" /></p>
+<p>Similarly, we can do this for yellow cards and red cards. Taking in all the information across the 3 charts, we can rougly make some rough deductions.</p>
+<ol style="list-style-type: decimal">
+<li><strong>Petty fouls</strong> - Having the most number of fouls doesn’t necessarily mean more yellow cards; most of these fouls often result in a free-kick to the opposition and nothing more.</li>
+<li><strong>A moment of red?</strong> - We also don’t observe any strong correlation between the number of fouls, yellow cards and red cards. For example, we see that while <strong>West Ham</strong> is clearly in the lead with 5 red cards, they are clearly near the bottom of the table for number of fouls and yellow cards. This could suggest that straight red cards are likely to be borne out of a moment of recklessness, anger, or folly.</li>
+</ol>
+<pre class="r"><code>events %&gt;%
+  filter(event_type == &quot;Yellow Card&quot;) %&gt;%
+  group_by(event_team) %&gt;%
+  summarise(num = n()) %&gt;%
+  ggplot(aes(x = reorder(event_team, num), y = num, fill = num)) +
+  geom_bar(position = position_dodge(), stat =&quot;identity&quot;) +
+  scale_fill_gradient(low = &quot;yellow4&quot;, high = &quot;yellow1&quot;) +
+  theme_classic() +
+  theme(legend.position = &quot;none&quot;) +
+  labs(x = &quot;EPL team&quot;, y = &quot;Number of Yellow Cards&quot;, title = &quot;Number of Yellow Cards by EPL Teams&quot;) +
+  coord_flip()</code></pre>
+<p><img src="/post/2018-01-07-soccer-and-anger-management_files/figure-html/yellowcard-1.png" width="672" /></p>
+<pre class="r"><code>events %&gt;%
+  filter(event_type == &quot;Red Card&quot;) %&gt;%
+  group_by(event_team) %&gt;%
+  summarise(num = n()) %&gt;%
+  ggplot(aes(x = reorder(event_team, num), y = num, fill = num)) +
+  geom_bar(position = position_dodge(), stat =&quot;identity&quot;) +
+  scale_fill_gradient(low = &quot;red4&quot;, high = &quot;red1&quot;) +
+  theme_classic() +
+  theme(legend.position = &quot;none&quot;) +
+  labs(x = &quot;EPL team&quot;, y = &quot;Number of Red Cards&quot;, title = &quot;Number of Red Cards by EPL Teams&quot;) +
+  coord_flip()</code></pre>
+<p><img src="/post/2018-01-07-soccer-and-anger-management_files/figure-html/redcard-1.png" width="672" /></p>
+<p>So… perhaps approaching disciplinary records from a team perspective may not be ideal. Let’s try it from the player’s perspective instead. For this analysis, I decided to create a discplinary score for each player. A yellow card gives you 1 point, while a red card gives you 3 points. Of course this is all just arbitary, and can be revised if your opinion differs. At the top of the discplinary record list is <strong>Gary O’Neil</strong>.</p>
+<pre class="r"><code>events %&gt;%
+  mutate(discplinary_score = ifelse(event_type == &quot;Yellow Card&quot;, 1,
+                             ifelse(event_type == &quot;Red Card&quot;, 3, 0))) %&gt;%
+  group_by(player) %&gt;%
+  summarise(Total_Score = sum(discplinary_score),
+            Num_Yellow = sum(ifelse(event_type == &quot;Yellow Card&quot;, 1, 0)),
+            Num_Red = sum(ifelse(event_type == &quot;Red Card&quot;, 1, 0))) %&gt;%
+  arrange(-Total_Score) %&gt;%
+  head(20)</code></pre>
+<pre><code>## # A tibble: 20 x 4
+##                 player Total_Score Num_Yellow Num_Red
+##                  &lt;chr&gt;       &lt;dbl&gt;      &lt;dbl&gt;   &lt;dbl&gt;
+##  1          gary oneil          13          7       2
+##  2    alexander tettey          11         11       0
+##  3        jack colback          11         11       0
+##  4        james milner          11         11       0
+##  5          mark noble          11          8       1
+##  6      victor wanyama          11          8       1
+##  7 aleksandar mitrovic          10          4       2
+##  8           eric dier          10         10       0
+##  9        erik pieters          10         10       0
+## 10       idrissa gueye          10         10       0
+## 11       james mcclean          10          7       1
+## 12    thibaut courtois          10          1       3
+## 13     ashley williams           9          9       0
+## 14        charlie adam           9          6       1
+## 15       claudio yacob           9          9       0
+## 16         diego costa           9          9       0
+## 17            emre can           9          9       0
+## 18         erik lamela           9          9       0
+## 19          john terry           9          6       1
+## 20       jonjo shelvey           9          9       0</code></pre>
+</div>
+<div id="currently-under-construction" class="section level3">
+<h3>CURRENTLY UNDER CONSTRUCTION</h3>
+<p>Sorry, this post is still under construction and will be completed soon! Thank you for your patience! :)</p>
+<p>Data source obtained from <a href="https://www.kaggle.com/">Kaggle</a>. Credit to Alin Secareanu for compiling this amazing dataset. Data can be accessed from this <a href="https://www.kaggle.com/secareanualin/football-events">link</a>.</p>
+</div>

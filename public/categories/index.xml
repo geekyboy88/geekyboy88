@@ -5,8 +5,9 @@
     <link>/categories/</link>
     <description>Recent content in Categories on geekyboy88</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language>
-    <lastBuildDate>Thu, 21 Dec 2017 00:00:00 +0000</lastBuildDate>
+    <managingEditor>kennethang7@gmail.com (Kenneth)</managingEditor>
+    <webMaster>kennethang7@gmail.com (Kenneth)</webMaster>
+    <lastBuildDate>Sun, 07 Jan 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/categories/index.xml" rel="self" type="application/rss+xml" />
     
@@ -14,8 +15,8 @@
     <item>
       <title>Analytics</title>
       <link>/categories/analytics/</link>
-      <pubDate>Thu, 21 Dec 2017 00:00:00 +0000</pubDate>
-      
+      <pubDate>Sun, 07 Jan 2018 00:00:00 +0000</pubDate>
+      <author>kennethang7@gmail.com (Kenneth)</author>
       <guid>/categories/analytics/</guid>
       <description></description>
     </item>
@@ -24,7 +25,7 @@
       <title>Mediacorp</title>
       <link>/categories/mediacorp/</link>
       <pubDate>Thu, 21 Dec 2017 00:00:00 +0000</pubDate>
-      
+      <author>kennethang7@gmail.com (Kenneth)</author>
       <guid>/categories/mediacorp/</guid>
       <description></description>
     </item>
@@ -32,9 +33,18 @@
     <item>
       <title>R</title>
       <link>/categories/r/</link>
-      <pubDate>Thu, 21 Dec 2017 00:00:00 +0000</pubDate>
-      
+      <pubDate>Sun, 07 Jan 2018 00:00:00 +0000</pubDate>
+      <author>kennethang7@gmail.com (Kenneth)</author>
       <guid>/categories/r/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Soccer</title>
+      <link>/categories/soccer/</link>
+      <pubDate>Sun, 07 Jan 2018 00:00:00 +0000</pubDate>
+      <author>kennethang7@gmail.com (Kenneth)</author>
+      <guid>/categories/soccer/</guid>
       <description></description>
     </item>
     
@@ -42,7 +52,7 @@
       <title>Text</title>
       <link>/categories/text/</link>
       <pubDate>Thu, 21 Dec 2017 00:00:00 +0000</pubDate>
-      
+      <author>kennethang7@gmail.com (Kenneth)</author>
       <guid>/categories/text/</guid>
       <description></description>
     </item>

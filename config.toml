@@ -1,27 +1,56 @@
 baseurl = "https://geekyboy88.netlify.com/"
-languageCode = "en-us"
+DefaultContentLanguage = "en"
+#DefaultContentLanguage = "ja"
 title = "geekyboy88"
-theme = "hugo-lithium-theme"
-googleAnalytics = ""
-disqusShortname = ""
+theme = "beautifulhugo"
+metaDataFormat = "yaml"
+pygmentsUseClasses = true
+pygmentCodeFences = true
+#disqusShortname = "XXX"
+#googleAnalytics = "XXX"
 
-[permalinks]
-    post = "/:year/:month/:day/:title/"
-    page = "/:title/"
+[Params]
+  subtitle = "geekyboy in a geeky world"
+  logo = "img/avatar-icon.png"
+  favicon = "img/favicon.ico"
+  dateFormat = "January 2, 2006"
+  commit = false
+  rss = true
+  comments = true
+  readingTime = true
+#  gcse = "012345678901234567890:abcdefghijk" # Get your code from google.com/cse. Make sure to go to "Look and Feel" and change Layout to "Full Width" and Theme to "Classic"
+
+#[[Params.bigimg]]
+#  src = "img/triangle.jpg"
+#  desc = "Triangle"
+#[[Params.bigimg]]
+#  src = "img/sphere.jpg"
+#  desc = "Sphere"
+#  # position: see values of CSS background-position.
+#  position = "center top"
+#[[Params.bigimg]]
+#  src = "img/hexagon.jpg"
+#  desc = "Hexagon"
+
+[Author]
+  name = "Kenneth"
+  website = "yourwebsite.com"
+  email = "kennethang7@gmail.com"
+  facebook = "Kenneth Ang"
+  github = "geekyboy88"
+  linkedin = "kenneth-ang-11936aa2"
 
 [[menu.main]]
-    name = "About myself"
-    url = "/about/"
+    name = "Blog"
+    url = ""
+    weight = 1
+
 [[menu.main]]
-    name = "GitHub"
-    url = "https://github.com/geekyboy88/geekyboy88/"
+    name = "About"
+    url = "page/about/"
+    weight = 3
 
-[params]
-    description = "Just a geeky blog to share my data analytics interest :)"
-
-    [params.logo]
-    url = "logo.png"
-    width = 50
-    height = 50
-    alt = "Logo"
-
+[[menu.main]]
+    name = "Tags"
+    url = "tags"
+    weight = 3
