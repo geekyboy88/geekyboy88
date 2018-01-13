@@ -272,8 +272,7 @@ player_ratio %>%
   geom_text(aes(y = midpoint, label = percent(count/sum(count))), size = 5)
 ```
 
-
-Hope you enjoy this post and look forward to the next post! If you have any thoughts or comments, do keep it with you or if you can share it with me if you can find a way to contact me. I'll try and create a comments section soon!
+Hope you enjoy this post and look forward to the next post! If you have any thoughts or comments, do hold on to that thought with you for now __or__ if you can share it with me if you can find a way to contact me. I'll try and create a comments section soon!
 
 
 
