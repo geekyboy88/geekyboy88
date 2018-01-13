@@ -117,7 +117,7 @@ ggmap(wmap) +
 
 ### Bring Umbrella?
 
-Another interesting data field in this dataset tells us what type of car park it is. For those of you who have been living in Singapore, you may be familiar with the many different type of car parks out there, i.e. surface, multi-storey, etc. The HDB carparks come in two main shapes, 1) surface carparks, or 2) multi-storey carparks. As you may also note from the table below, we have quite some way to go towards having mechanised car park systems.
+Another interesting data field in this dataset tells us what type of car park it is. For those of you who have been living in Singapore, you may be familiar with the many different type of car parks out there, i.e. surface, multi-storey, etc. The HDB carparks come in two main shapes, 1) surface carparks, or 2) multi-storey carparks. As you may also note from the table below, we have quite some way to go towards having mechanised car park systems (_if this is indeed the intention_).
 
 ```{r umbrella}
 data %>%
@@ -125,6 +125,17 @@ data %>%
   summarise(Number_of_Carparks = n())
 ```
 
+So back to the original question: on rainy days (_esp during the monsoon season_), which are the places that you might be able to get away with not having an umberlla in your car (_and still be able to get out of it_)?
+
+```{r umbrella1}
+ggmap(wmap) +
+  geom_point(aes(x = long, y = lat, colour = car_park_type, alpha = 0.3), data = data, size = 1) +
+  labs(colour = "Type of Car Park", x = "Longitude", y = "Latitude") +
+  theme(legend.position = "bottom")
+```
+
+
+Hope you enjoy this very quick second post on HDB Carpark locations. 
 
 
 _Note: This post contains information on [HDB Carpark Information](https://data.gov.sg/dataset/hdb-carpark-information?view_id=398e65ae-e2cb-4312-8651-6e65d6f19ed1&resource_id=139a3035-e624-4f56-b63f-89ae28d4ae4c) accessed [today's date](https://www.google.com.sg/search?q=today%27s+date&oq=today%27s+date&aqs=chrome..69i57.1121j0j7&sourceid=chrome&ie=UTF-8) which is made available under the terms of the [Singapore Open Data Licence version 1.0](https://data.gov.sg/open-data-licence)._

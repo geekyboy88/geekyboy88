@@ -1,8 +1,8 @@
 ---
-title: Soccer and Anger Management
+title: Soccer and Discipline
 author: geekyboy88
 date: '2018-01-07'
-slug: soccer-and-anger-management
+slug: soccer-and-discipline
 categories:
   - R
   - soccer
@@ -27,7 +27,7 @@ pre {
 }
 </style>
 
-### Soccer and Anger Management
+### Soccer and Discipline
 
 Hi everyone again. For my third post, I have decided to look at some soccer data that was recently uploaded at Kaggle. This is a mega dataset comprising close to 900k records of events across a number of major European leagues over the course of about 5 seasons. The __great__ thing about events data is that it gives you a really intricate flavour of what happens in the match. 
 
@@ -40,6 +40,7 @@ library(magrittr)
 library(RColorBrewer)
 library(ggplot2)
 library(knitr)
+library(scales)
 library(dplyr)
 ```
 
@@ -134,7 +135,7 @@ events %>%
   coord_flip()
 ```
 
-So... perhaps approaching disciplinary records from a team perspective may not be ideal. Let's try it from the player's perspective instead. For this analysis, I decided to create a discplinary score for each player. A yellow card gives you 1 point, while a red card gives you 3 points. Of course this is all just arbitary, and can be revised if your opinion differs. At the top of the discplinary record list is __Gary O'Neil__. 
+So... perhaps approaching disciplinary records from a team perspective may not be ideal. Let's try it from the player's perspective instead. For this analysis, I decided to create a discplinary score for each player. A yellow card gives you 1 point, while a red card gives you 3 points. Of course this is all just arbitary, and can be revised if your opinion differs. At the top of the discplinary record list is __Gary O'Neil__. Not exactly who I would expect to be topping the charts for worst disciplinary records, but yes, __Gary O'Neil__ is our man for that season.
 
 ```{r player}
 events %>%
@@ -150,28 +151,129 @@ events %>%
 
 ```
 
+### Petty Fouls
+
+In the previous section, we looked at discipline from the angle of receiving some form of __punishment__, e.g. through yellow or red cards. However, in normal games, players are often given a certain degree of leeway (_unless its a horrific foul_) before they get their first booking (_often a yellow card_). In this section, I decided to bring the fouls committed back into the fold, and try and identify players who have a typically good knack of committing a number of fouls without incurring any form of punishment.
+
+To do so, I first aggregated, for each player playing in a match, what is the number of fouls committed and yellow cards received in that match. Using these two information, I constructed a fouls to yellow cards ratio _(e.g. if Nemanja Matic commits 4 fouls and receives 1 yellow card his ratio is __4:1__)_ I subsequently counted the number of times each player has this particular fouls to yellow cards ratio.
+
+```{r foulspergame}
+fouls_per_game = events %>% 
+  group_by(id_odsp, player, event_team) %>%
+  summarise(num_foul = sum(ifelse(event_type == "Foul", 1, 0)) +
+              sum(ifelse(event_type == "Yellow Card", 1, 0)),
+            num_yellow = sum(ifelse(event_type == "Yellow Card", 1, 0))) %>%
+  mutate(fouls_to_yellow = paste0(num_foul, ":", num_yellow))
+
+player_ratio = fouls_per_game %>%
+  group_by(player, fouls_to_yellow) %>%
+  summarise(count = n())
+```
+
+With this, let's take a look at the top 10 fouls to yellow cards ratio and the players associated with it. From the table below, we can tell that Nemanja Matic is the true champion in committing the most number of fouls and getting away with it, as he had on one occasion, committed 8 fouls in a match without incurring a yellow card. Other players who have committed a number of fouls in the similar range have, _unfortunately_, found themselves punished with a yellow card.
+
+_Note: The number of fouls include the foul that led to a yellow card._
+
+```{r topfoultoyellow}
+kable(head(player_ratio %>% 
+             arrange(desc(fouls_to_yellow)), 15))
+```
+
+### Likelihood of seeing yellow
+
+So this then leads to the question: what is the likelihood of you getting a yellow card? Well, to comprehensively answer this question, I thought we could start off by imagining ourselves as a player starting a match with a clean slate. At some point in time, you go in for a tackle (_not knowing if it will be a clean, clumsy or reckless tackle_), and right at that point in time when the referee blows his whistle (_meaning to say that the tackle you made was definitely not a clean one_) you start to wonder what is the chance that you will be given a yellow card. 
+
+To find out what is the __probability of you getting a yellow card on your first foul__, we first include every player who has ever committed at least 1 foul into our sample.
+
+_Note: For simplicity, assume that the yellow card is given to the player on his last foul, i.e for a foul to yellow ratio of 4:1, the yellow card is given to the player on his 4th foul._
+
+Based on the chart below, overall, condition on committing a foul (_or getting called for committing a foul by the referee, given that you could technically get away with committing one_), you have a __6.7%__ chance of getting a yellow card for your first foul. This is quite consistent with the perception that players usually get away with their first fouls.
+
+We could also inteprete this another way, by taking into account the heterogeneous nature of fouls. Fouls can either be soft, clumsy, slightly late, very late, or reckless, etc. If we then assume then that referees have eagle eye and consistently award yellow cards for fouls that are deserving of one, this __6.7%__ is actually, for players who committed a foul, the probability of them committing a reckless one.
+
+```{r likelihood1}
+player_ratio %>%
+  filter(fouls_to_yellow != "0:0" & substr(fouls_to_yellow,3,3) != "2") %>%
+  mutate(group = ifelse(fouls_to_yellow == "1:1", "Yellow on First Foul", "No Yellow on First Foul")) %>%
+  group_by(group) %>%
+  summarise(count = n()) %>%
+    mutate(cumulative = cumsum(count),
+         midpoint =  sum(count) - (cumulative - count/2)) %>%
+  ggplot(aes(x = "", y = count, fill = group)) +
+  geom_bar(width = 1, stat = "identity") +
+  scale_fill_manual(values = c("grey95","yellow")) +
+  coord_polar("y", start = 0) +
+  theme_light() +
+  theme(legend.position = "bottom") +
+  labs(x = "", y = "", fill = "Legend", title = "Probability of getting a yellow card \non your first foul") +
+  geom_text(aes(y = midpoint, label = percent(count/sum(count))), size = 5)
+```
+
+If one foul is all you are going to commit during the entire match, then the above analysis should be sufficient for you. However, if you had committed the first foul early in the match, then you would probably want to read on to find out if you again hear the referee's whistle after going in for a tackle. 
+
+To estimate the probability of getting a yellow card, we now sub-sample to exclude those who committed less than 2 fouls in a match. 
+
+Based on the chart below, we find that the probability of you getting a yellow card on your second foul is significantly higher at __22%__. 
+
+```{r likelihood2}
+player_ratio %>%
+  filter(as.numeric(substr(fouls_to_yellow,1,1)) > 1 & substr(fouls_to_yellow,3,3) != "2") %>%
+  mutate(group = ifelse(fouls_to_yellow == "2:1", "Yellow on Second Foul", "No Yellow on Second Foul")) %>%
+  group_by(group) %>%
+  summarise(count = n()) %>%
+    mutate(cumulative = cumsum(count),
+         midpoint =  sum(count) - (cumulative - count/2)) %>%
+  ggplot(aes(x = "", y = count, fill = group)) +
+  geom_bar(width = 1, stat = "identity") +
+  scale_fill_manual(values = c("grey85","yellow")) +
+  coord_polar("y", start = 0) +
+  theme_light() +
+  theme(legend.position = "bottom") +
+  labs(x = "", y = "", fill = "Legend", title = "Probability of getting a yellow card \non your second foul") +
+  geom_text(aes(y = midpoint, label = percent(count/sum(count))), size = 5)
+```
+
+We repeat the same for the third (__30.3%__) and fourth (__39.2%__) fouls. Not surprisingly, the probabilities are increasing, which is not surprising because your name becomes more salient with the referee with each foul, and there comes a stage where the referee utimately decides to make you see yellow. However, do note that the probabilities cannot be compared with reference to each other, each situation is evaluated on its on (_conditional probabilites_).
+
+```{r likelihood3}
+player_ratio %>%
+  filter(as.numeric(substr(fouls_to_yellow,1,1)) > 2 & substr(fouls_to_yellow,3,3) != "2") %>%
+  mutate(group = ifelse(fouls_to_yellow == "3:1", "Yellow on Third Foul", "No Yellow on Third Foul")) %>%
+  group_by(group) %>%
+  summarise(count = n()) %>%
+    mutate(cumulative = cumsum(count),
+         midpoint =  sum(count) - (cumulative - count/2)) %>%
+  ggplot(aes(x = "", y = count, fill = group)) +
+  geom_bar(width = 1, stat = "identity") +
+  scale_fill_manual(values = c("grey75","yellow")) +
+  coord_polar("y", start = 0) +
+  theme_light() +
+  theme(legend.position = "bottom") +
+  labs(x = "", y = "", fill = "Legend", title = "Probability of getting a yellow card \non your third foul") +
+  geom_text(aes(y = midpoint, label = percent(count/sum(count))), size = 5)
+```
 
 
+```{r likelihood4}
+player_ratio %>%
+  filter(as.numeric(substr(fouls_to_yellow,1,1)) > 3 & substr(fouls_to_yellow,3,3) != "2") %>%
+  mutate(group = ifelse(fouls_to_yellow == "4:1", "Yellow on Fourth Foul", "No Yellow on Fourth Foul")) %>%
+  group_by(group) %>%
+  summarise(count = n()) %>%
+    mutate(cumulative = cumsum(count),
+         midpoint =  sum(count) - (cumulative - count/2)) %>%
+  ggplot(aes(x = "", y = count, fill = group)) +
+  geom_bar(width = 1, stat = "identity") +
+  scale_fill_manual(values = c("grey65","yellow")) +
+  coord_polar("y", start = 0) +
+  theme_light() +
+  theme(legend.position = "bottom") +
+  labs(x = "", y = "", fill = "Legend", title = "Probability of getting a yellow card \non your fourth foul") +
+  geom_text(aes(y = midpoint, label = percent(count/sum(count))), size = 5)
+```
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### CURRENTLY UNDER CONSTRUCTION
-
-Sorry, this post is still under construction and will be completed soon! Thank you for your patience! :)
+Hope you enjoy this post and look forward to the next post! If you have any thoughts or comments, do keep it with you or if you can share it with me if you can find a way to contact me. I'll try and create a comments section soon!
 
 
 

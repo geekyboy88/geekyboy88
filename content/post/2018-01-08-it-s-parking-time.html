@@ -188,7 +188,7 @@ rm(geo)</code></pre>
 </div>
 <div id="bring-umbrella" class="section level3">
 <h3>Bring Umbrella?</h3>
-<p>Another interesting data field in this dataset tells us what type of car park it is. For those of you who have been living in Singapore, you may be familiar with the many different type of car parks out there, i.e. surface, multi-storey, etc. The HDB carparks come in two main shapes, 1) surface carparks, or 2) multi-storey carparks. As you may also note from the table below, we have quite some way to go towards having mechanised car park systems.</p>
+<p>Another interesting data field in this dataset tells us what type of car park it is. For those of you who have been living in Singapore, you may be familiar with the many different type of car parks out there, i.e. surface, multi-storey, etc. The HDB carparks come in two main shapes, 1) surface carparks, or 2) multi-storey carparks. As you may also note from the table below, we have quite some way to go towards having mechanised car park systems (<em>if this is indeed the intention</em>).</p>
 <pre class="r"><code>data %&gt;%
   group_by(car_park_type) %&gt;%
   summarise(Number_of_Carparks = n())</code></pre>
@@ -202,6 +202,13 @@ rm(geo)</code></pre>
 ## 5           MULTI-STOREY CAR PARK                930
 ## 6                SURFACE CAR PARK               1067
 ## 7   SURFACE/MULTI-STOREY CAR PARK                 12</code></pre>
+<p>So back to the original question: on rainy days (<em>esp during the monsoon season</em>), which are the places that you might be able to get away with not having an umberlla in your car (<em>and still be able to get out of it</em>)?</p>
+<pre class="r"><code>ggmap(wmap) +
+  geom_point(aes(x = long, y = lat, colour = car_park_type, alpha = 0.3), data = data, size = 1) +
+  labs(colour = &quot;Type of Car Park&quot;, x = &quot;Longitude&quot;, y = &quot;Latitude&quot;) +
+  theme(legend.position = &quot;bottom&quot;)</code></pre>
+<p><img src="/post/2018-01-08-it-s-parking-time_files/figure-html/umbrella1-1.png" width="672" /></p>
+<p>Hope you enjoy this very quick second post on HDB Carpark locations.</p>
 <p><em>Note: This post contains information on <a href="https://data.gov.sg/dataset/hdb-carpark-information?view_id=398e65ae-e2cb-4312-8651-6e65d6f19ed1&amp;resource_id=139a3035-e624-4f56-b63f-89ae28d4ae4c">HDB Carpark Information</a> accessed <a href="https://www.google.com.sg/search?q=today%27s+date&amp;oq=today%27s+date&amp;aqs=chrome..69i57.1121j0j7&amp;sourceid=chrome&amp;ie=UTF-8">today’s date</a> which is made available under the terms of the <a href="https://data.gov.sg/open-data-licence">Singapore Open Data Licence version 1.0</a>.</em></p>
 </div>
 </div>

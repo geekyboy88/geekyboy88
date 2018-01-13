@@ -1,8 +1,8 @@
 ---
-title: Soccer and Anger Management
+title: Soccer and Discipline
 author: geekyboy88
 date: '2018-01-07'
-slug: soccer-and-anger-management
+slug: soccer-and-discipline
 categories:
   - R
   - soccer
@@ -28,8 +28,8 @@ pre {
   font-size: 14px
 }
 </style>
-<div id="soccer-and-anger-management" class="section level3">
-<h3>Soccer and Anger Management</h3>
+<div id="soccer-and-discipline" class="section level3">
+<h3>Soccer and Discipline</h3>
 <p>Hi everyone again. For my third post, I have decided to look at some soccer data that was recently uploaded at Kaggle. This is a mega dataset comprising close to 900k records of events across a number of major European leagues over the course of about 5 seasons. The <strong>great</strong> thing about events data is that it gives you a really intricate flavour of what happens in the match.</p>
 <div id="packages" class="section level4">
 <h4>Packages</h4>
@@ -38,6 +38,7 @@ pre {
 library(RColorBrewer)
 library(ggplot2)
 library(knitr)
+library(scales)
 library(dplyr)</code></pre>
 </div>
 <div id="data" class="section level4">
@@ -477,7 +478,7 @@ rm(ginf)</code></pre>
   labs(x = &quot;EPL team&quot;, y = &quot;Number of Red Cards&quot;, title = &quot;Number of Red Cards by EPL Teams&quot;) +
   coord_flip()</code></pre>
 <p><img src="/post/2018-01-07-soccer-and-anger-management_files/figure-html/redcard-1.png" width="672" /></p>
-<p>So… perhaps approaching disciplinary records from a team perspective may not be ideal. Let’s try it from the player’s perspective instead. For this analysis, I decided to create a discplinary score for each player. A yellow card gives you 1 point, while a red card gives you 3 points. Of course this is all just arbitary, and can be revised if your opinion differs. At the top of the discplinary record list is <strong>Gary O’Neil</strong>.</p>
+<p>So… perhaps approaching disciplinary records from a team perspective may not be ideal. Let’s try it from the player’s perspective instead. For this analysis, I decided to create a discplinary score for each player. A yellow card gives you 1 point, while a red card gives you 3 points. Of course this is all just arbitary, and can be revised if your opinion differs. At the top of the discplinary record list is <strong>Gary O’Neil</strong>. Not exactly who I would expect to be topping the charts for worst disciplinary records, but yes, <strong>Gary O’Neil</strong> is our man for that season.</p>
 <pre class="r"><code>events %&gt;%
   mutate(discplinary_score = ifelse(event_type == &quot;Yellow Card&quot;, 1,
                              ifelse(event_type == &quot;Red Card&quot;, 3, 0))) %&gt;%
@@ -511,8 +512,186 @@ rm(ginf)</code></pre>
 ## 19          john terry           9          6       1
 ## 20       jonjo shelvey           9          9       0</code></pre>
 </div>
-<div id="currently-under-construction" class="section level3">
-<h3>CURRENTLY UNDER CONSTRUCTION</h3>
-<p>Sorry, this post is still under construction and will be completed soon! Thank you for your patience! :)</p>
+<div id="petty-fouls" class="section level3">
+<h3>Petty Fouls</h3>
+<p>In the previous section, we looked at discipline from the angle of receiving some form of <strong>punishment</strong>, e.g. through yellow or red cards. However, in normal games, players are often given a certain degree of leeway (<em>unless its a horrific foul</em>) before they get their first booking (<em>often a yellow card</em>). In this section, I decided to bring the fouls committed back into the fold, and try and identify players who have a typically good knack of committing a number of fouls without incurring any form of punishment.</p>
+<p>To do so, I first aggregated, for each player playing in a match, what is the number of fouls committed and yellow cards received in that match. Using these two information, I constructed a fouls to yellow cards ratio <em>(e.g. if Nemanja Matic commits 4 fouls and receives 1 yellow card his ratio is <strong>4:1</strong>)</em> I subsequently counted the number of times each player has this particular fouls to yellow cards ratio.</p>
+<pre class="r"><code>fouls_per_game = events %&gt;% 
+  group_by(id_odsp, player, event_team) %&gt;%
+  summarise(num_foul = sum(ifelse(event_type == &quot;Foul&quot;, 1, 0)) +
+              sum(ifelse(event_type == &quot;Yellow Card&quot;, 1, 0)),
+            num_yellow = sum(ifelse(event_type == &quot;Yellow Card&quot;, 1, 0))) %&gt;%
+  mutate(fouls_to_yellow = paste0(num_foul, &quot;:&quot;, num_yellow))
+
+player_ratio = fouls_per_game %&gt;%
+  group_by(player, fouls_to_yellow) %&gt;%
+  summarise(count = n())</code></pre>
+<p>With this, let’s take a look at the top 10 fouls to yellow cards ratio and the players associated with it. From the table below, we can tell that Nemanja Matic is the true champion in committing the most number of fouls and getting away with it, as he had on one occasion, committed 8 fouls in a match without incurring a yellow card. Other players who have committed a number of fouls in the similar range have, <em>unfortunately</em>, found themselves punished with a yellow card.</p>
+<p><em>Note: The number of fouls include the foul that led to a yellow card.</em></p>
+<pre class="r"><code>kable(head(player_ratio %&gt;% 
+             arrange(desc(fouls_to_yellow)), 15))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">player</th>
+<th align="left">fouls_to_yellow</th>
+<th align="right">count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">erik lamela</td>
+<td align="left">8:1</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">lucas leiva</td>
+<td align="left">8:1</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">nemanja matic</td>
+<td align="left">8:0</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">lucas leiva</td>
+<td align="left">7:1</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">shane long</td>
+<td align="left">7:1</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">alan hutton</td>
+<td align="left">6:2</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">alexander tettey</td>
+<td align="left">6:2</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">daryl janmaat</td>
+<td align="left">6:2</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">almen abdi</td>
+<td align="left">6:1</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">ander herrera</td>
+<td align="left">6:1</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">andre ayew</td>
+<td align="left">6:1</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">fernandinho</td>
+<td align="left">6:1</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">marko arnautovic</td>
+<td align="left">6:1</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">troy deeney</td>
+<td align="left">6:1</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">victor wanyama</td>
+<td align="left">6:1</td>
+<td align="right">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="likelihood-of-seeing-yellow" class="section level3">
+<h3>Likelihood of seeing yellow</h3>
+<p>So this then leads to the question: what is the likelihood of you getting a yellow card? Well, to comprehensively answer this question, I thought we could start off by imagining ourselves as a player starting a match with a clean slate. At some point in time, you go in for a tackle (<em>not knowing if it will be a clean, clumsy or reckless tackle</em>), and right at that point in time when the referee blows his whistle (<em>meaning to say that the tackle you made was definitely not a clean one</em>) you start to wonder what is the chance that you will be given a yellow card.</p>
+<p>To find out what is the <strong>probability of you getting a yellow card on your first foul</strong>, we first include every player who has ever committed at least 1 foul into our sample.</p>
+<p><em>Note: For simplicity, assume that the yellow card is given to the player on his last foul, i.e for a foul to yellow ratio of 4:1, the yellow card is given to the player on his 4th foul.</em></p>
+<p>Based on the chart below, overall, condition on committing a foul (<em>or getting called for committing a foul by the referee, given that you could technically get away with committing one</em>), you have a <strong>6.7%</strong> chance of getting a yellow card for your first foul. This is quite consistent with the perception that players usually get away with their first fouls.</p>
+<p>We could also inteprete this another way, by taking into account the heterogeneous nature of fouls. Fouls can either be soft, clumsy, slightly late, very late, or reckless, etc. If we then assume then that referees have eagle eye and consistently award yellow cards for fouls that are deserving of one, this <strong>6.7%</strong> is actually, for players who committed a foul, the probability of them committing a reckless one.</p>
+<pre class="r"><code>player_ratio %&gt;%
+  filter(fouls_to_yellow != &quot;0:0&quot; &amp; substr(fouls_to_yellow,3,3) != &quot;2&quot;) %&gt;%
+  mutate(group = ifelse(fouls_to_yellow == &quot;1:1&quot;, &quot;Yellow on First Foul&quot;, &quot;No Yellow on First Foul&quot;)) %&gt;%
+  group_by(group) %&gt;%
+  summarise(count = n()) %&gt;%
+    mutate(cumulative = cumsum(count),
+         midpoint =  sum(count) - (cumulative - count/2)) %&gt;%
+  ggplot(aes(x = &quot;&quot;, y = count, fill = group)) +
+  geom_bar(width = 1, stat = &quot;identity&quot;) +
+  scale_fill_manual(values = c(&quot;grey95&quot;,&quot;yellow&quot;)) +
+  coord_polar(&quot;y&quot;, start = 0) +
+  theme_light() +
+  theme(legend.position = &quot;bottom&quot;) +
+  labs(x = &quot;&quot;, y = &quot;&quot;, fill = &quot;Legend&quot;, title = &quot;Probability of getting a yellow card \non your first foul&quot;) +
+  geom_text(aes(y = midpoint, label = percent(count/sum(count))), size = 5)</code></pre>
+<p><img src="/post/2018-01-07-soccer-and-anger-management_files/figure-html/likelihood1-1.png" width="672" /></p>
+<p>If one foul is all you are going to commit during the entire match, then the above analysis should be sufficient for you. However, if you had committed the first foul early in the match, then you would probably want to read on to find out if you again hear the referee’s whistle after going in for a tackle.</p>
+<p>To estimate the probability of getting a yellow card, we now sub-sample to exclude those who committed less than 2 fouls in a match.</p>
+<p>Based on the chart below, we find that the probability of you getting a yellow card on your second foul is significantly higher at <strong>22%</strong>.</p>
+<pre class="r"><code>player_ratio %&gt;%
+  filter(as.numeric(substr(fouls_to_yellow,1,1)) &gt; 1 &amp; substr(fouls_to_yellow,3,3) != &quot;2&quot;) %&gt;%
+  mutate(group = ifelse(fouls_to_yellow == &quot;2:1&quot;, &quot;Yellow on Second Foul&quot;, &quot;No Yellow on Second Foul&quot;)) %&gt;%
+  group_by(group) %&gt;%
+  summarise(count = n()) %&gt;%
+    mutate(cumulative = cumsum(count),
+         midpoint =  sum(count) - (cumulative - count/2)) %&gt;%
+  ggplot(aes(x = &quot;&quot;, y = count, fill = group)) +
+  geom_bar(width = 1, stat = &quot;identity&quot;) +
+  scale_fill_manual(values = c(&quot;grey85&quot;,&quot;yellow&quot;)) +
+  coord_polar(&quot;y&quot;, start = 0) +
+  theme_light() +
+  theme(legend.position = &quot;bottom&quot;) +
+  labs(x = &quot;&quot;, y = &quot;&quot;, fill = &quot;Legend&quot;, title = &quot;Probability of getting a yellow card \non your second foul&quot;) +
+  geom_text(aes(y = midpoint, label = percent(count/sum(count))), size = 5)</code></pre>
+<p><img src="/post/2018-01-07-soccer-and-anger-management_files/figure-html/likelihood2-1.png" width="672" /></p>
+<p>We repeat the same for the third (<strong>30.3%</strong>) and fourth (<strong>39.2%</strong>) fouls. Not surprisingly, the probabilities are increasing, which is not surprising because your name becomes more salient with the referee with each foul, and there comes a stage where the referee utimately decides to make you see yellow. However, do note that the probabilities cannot be compared with reference to each other, each situation is evaluated on its on (<em>conditional probabilites</em>).</p>
+<pre class="r"><code>player_ratio %&gt;%
+  filter(as.numeric(substr(fouls_to_yellow,1,1)) &gt; 2 &amp; substr(fouls_to_yellow,3,3) != &quot;2&quot;) %&gt;%
+  mutate(group = ifelse(fouls_to_yellow == &quot;3:1&quot;, &quot;Yellow on Third Foul&quot;, &quot;No Yellow on Third Foul&quot;)) %&gt;%
+  group_by(group) %&gt;%
+  summarise(count = n()) %&gt;%
+    mutate(cumulative = cumsum(count),
+         midpoint =  sum(count) - (cumulative - count/2)) %&gt;%
+  ggplot(aes(x = &quot;&quot;, y = count, fill = group)) +
+  geom_bar(width = 1, stat = &quot;identity&quot;) +
+  scale_fill_manual(values = c(&quot;grey75&quot;,&quot;yellow&quot;)) +
+  coord_polar(&quot;y&quot;, start = 0) +
+  theme_light() +
+  theme(legend.position = &quot;bottom&quot;) +
+  labs(x = &quot;&quot;, y = &quot;&quot;, fill = &quot;Legend&quot;, title = &quot;Probability of getting a yellow card \non your third foul&quot;) +
+  geom_text(aes(y = midpoint, label = percent(count/sum(count))), size = 5)</code></pre>
+<p><img src="/post/2018-01-07-soccer-and-anger-management_files/figure-html/likelihood3-1.png" width="672" /></p>
+<pre class="r"><code>player_ratio %&gt;%
+  filter(as.numeric(substr(fouls_to_yellow,1,1)) &gt; 3 &amp; substr(fouls_to_yellow,3,3) != &quot;2&quot;) %&gt;%
+  mutate(group = ifelse(fouls_to_yellow == &quot;4:1&quot;, &quot;Yellow on Fourth Foul&quot;, &quot;No Yellow on Fourth Foul&quot;)) %&gt;%
+  group_by(group) %&gt;%
+  summarise(count = n()) %&gt;%
+    mutate(cumulative = cumsum(count),
+         midpoint =  sum(count) - (cumulative - count/2)) %&gt;%
+  ggplot(aes(x = &quot;&quot;, y = count, fill = group)) +
+  geom_bar(width = 1, stat = &quot;identity&quot;) +
+  scale_fill_manual(values = c(&quot;grey65&quot;,&quot;yellow&quot;)) +
+  coord_polar(&quot;y&quot;, start = 0) +
+  theme_light() +
+  theme(legend.position = &quot;bottom&quot;) +
+  labs(x = &quot;&quot;, y = &quot;&quot;, fill = &quot;Legend&quot;, title = &quot;Probability of getting a yellow card \non your fourth foul&quot;) +
+  geom_text(aes(y = midpoint, label = percent(count/sum(count))), size = 5)</code></pre>
+<p><img src="/post/2018-01-07-soccer-and-anger-management_files/figure-html/likelihood4-1.png" width="672" /></p>
+<p>Hope you enjoy this post and look forward to the next post! If you have any thoughts or comments, do keep it with you or if you can share it with me if you can find a way to contact me. I’ll try and create a comments section soon!</p>
 <p>Data source obtained from <a href="https://www.kaggle.com/">Kaggle</a>. Credit to Alin Secareanu for compiling this amazing dataset. Data can be accessed from this <a href="https://www.kaggle.com/secareanualin/football-events">link</a>.</p>
 </div>

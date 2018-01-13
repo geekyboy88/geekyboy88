@@ -13,12 +13,12 @@
     
     
     <item>
-      <title>Soccer and Anger Management</title>
-      <link>/post/soccer-and-anger-management/</link>
+      <title>Soccer and Discipline</title>
+      <link>/post/soccer-and-discipline/</link>
       <pubDate>Sun, 07 Jan 2018 00:00:00 +0000</pubDate>
       <author>kennethang7@gmail.com (Kenneth)</author>
-      <guid>/post/soccer-and-anger-management/</guid>
-      <description>body, td { font-size: 14px; } code.r{ font-size: 14px; } pre { font-size: 14px }  Soccer and Anger Management Hi everyone again. For my third post, I have decided to look at some soccer data that was recently uploaded at Kaggle. This is a mega dataset comprising close to 900k records of events across a number of major European leagues over the course of about 5 seasons. The great thing about events data is that it gives you a really intricate flavour of what happens in the match.</description>
+      <guid>/post/soccer-and-discipline/</guid>
+      <description>body, td { font-size: 14px; } code.r{ font-size: 14px; } pre { font-size: 14px }  Soccer and Discipline Hi everyone again. For my third post, I have decided to look at some soccer data that was recently uploaded at Kaggle. This is a mega dataset comprising close to 900k records of events across a number of major European leagues over the course of about 5 seasons. The great thing about events data is that it gives you a really intricate flavour of what happens in the match.</description>
     </item>
     
     <item>
