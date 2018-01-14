@@ -1,0 +1,113 @@
+---
+title: Soccer and Discipline - Part 2
+author: geekyboy88
+date: '2018-01-20'
+slug: soccer-and-discipline-part-2
+categories:
+  - R
+  - soccer
+tags:
+  - R
+  - soccer
+---
+
+<style type="text/css">
+
+body, td {
+   font-size: 18px;
+}
+code.r{
+  font-size: 18px;
+}
+pre {
+  font-size: 18px
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning=FALSE, echo=FALSE, comment=NA, message=FALSE)
+```
+
+### Soccer and Discipline - Part 2
+
+In my previous post, I approached soccer analytics from the discipline perspective, and tried to estimate what the probability of getting a yellow card is, on the condition that the referee calls it a foul in the first place. 
+
+To provide another perspective, this time round, I wanted to dig further to discover what other insights about disciplinary issues we can glean from the data.
+
+```{r loadpackages,message=FALSE,warning=FALSE,echo=F}
+library(magrittr)
+library(RColorBrewer)
+library(ggplot2)
+library(knitr)
+library(scales)
+library(dplyr)
+```
+
+```{r loaddata,message=FALSE,warning=FALSE,echo=F}
+events = read.csv("../../static/data/events1.csv", stringsAsFactors = F)
+ginf = read.csv("../../static/data/ginf.csv", stringsAsFactors = F)
+events %<>% merge(ginf[,c(1, 4:9)], by = "id_odsp", all.x = T)
+rm(ginf)
+events %<>%
+  filter(event_type == 4 | event_type == 6 | event_type == 3) %>%
+  mutate(event_type = ifelse(event_type == 4, "Yellow Card",
+                      ifelse(event_type == 6, "Red Card", "Foul")))
+```
+
+### Timing of fouls
+
+__Time__ is of the essence in a soccer match. There are, after all, only 90 minutes + stoppage time, for the players to materialise everything that they had put in in training for the past week. Depending on the circumstances, some may find that that the 90 minutes is __too long__, while for others, time may be __insufficient__.
+
+__Timing__ is also important in the context of disciplinary issues in a soccer match. If you had committed a foul early, it is quite likely that the referee would take more notice of you and hence you may wish to thread more carefully. If you had received a yellow card, then you would have to take even more precaution given that getting a second yellow would result in your team being handled a numerical disadvantage. Well, lastly, if you had gotten a second yellow or red card early in the match, you'd probably be buying everyone a round of drinks after the match!
+
+To start off, we first look at the distribution of fouls, yellow cards, and red cards across the duration of the match.
+
+```{r time1}
+events %>%
+  filter(event_type == "Foul") %>%
+  group_by(time, event_type) %>%
+  summarise(count = n()) %>%
+  ggplot(aes(x = time, y = count, fill = "purple")) +
+  geom_bar(stat = "identity", position = position_dodge(), color = "black") +
+  scale_fill_manual(values = c("purple")) +
+  theme_classic() +
+  theme(legend.position = "none") +
+  labs(x = "Time of Match (minute)", y = "Count of Fouls") +
+  scale_x_continuous(breaks = c(0,15,30,45,60,75,90,105))
+
+events %>%
+  filter(event_type == "Yellow Card") %>%
+  group_by(time, event_type) %>%
+  summarise(count = n()) %>%
+  ggplot(aes(x = time, y = count, fill = "yellow")) +
+  geom_bar(stat = "identity", position = position_dodge(), color = "black") +
+  scale_fill_manual(values = c("yellow")) +
+  theme_classic() +
+  theme(legend.position = "none") +
+  labs(x = "Time of Match (minute)", y = "Count of Yellow Cards") +
+  scale_x_continuous(breaks = c(0,15,30,45,60,75,90,105))
+
+events %>%
+  filter(event_type == "Red Card") %>%
+  group_by(time, event_type) %>%
+  summarise(count = n()) %>%
+  ggplot(aes(x = time, y = count, fill = "red")) +
+  geom_bar(stat = "identity", position = position_dodge(), color = "black") +
+  scale_fill_manual(values = c("red")) +
+  theme_classic() +
+  theme(legend.position = "none") +
+  labs(x = "Time of Match (minute)", y = "Count of Red Cards") +
+  scale_x_continuous(breaks = c(0,15,30,45,60,75,90,105), limits = c(0,105)) 
+```
+
+### Are more fouls committed during Derby matches?
+
+### Do particular teams tend to commit fouls at certain points in time during the match?
+
+
+
+
+
+
+
+

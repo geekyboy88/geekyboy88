@@ -17,13 +17,13 @@ tags:
 <style type="text/css">
 
 body, td {
-   font-size: 14px;
+   font-size: 18px;
 }
 code.r{
-  font-size: 14px;
+  font-size: 18px;
 }
 pre {
-  font-size: 14px
+  font-size: 18px
 }
 </style>
 
@@ -187,16 +187,16 @@ To find out what is the __probability of you getting a yellow card on your first
 
 _Note: For simplicity, assume that the yellow card is given to the player on his last foul, i.e for a foul to yellow ratio of 4:1, the yellow card is given to the player on his 4th foul._
 
-Based on the chart below, overall, condition on committing a foul (_or getting called for committing a foul by the referee, given that you could technically get away with committing one_), you have a __6.7%__ chance of getting a yellow card for your first foul. This is quite consistent with the perception that players usually get away with their first fouls.
+Based on the chart below, overall, condition on committing a foul (_or getting called for committing a foul by the referee, given that you could technically get away with committing one_), you have a __3%__ chance of getting a yellow card for your first foul. This is quite consistent with the perception that players usually get away with their first fouls.
 
-We could also inteprete this another way, by taking into account the heterogeneous nature of fouls. Fouls can either be soft, clumsy, slightly late, very late, or reckless, etc. If we then assume then that referees have eagle eye and consistently award yellow cards for fouls that are deserving of one, this __6.7%__ is actually, for players who committed a foul, the probability of them committing a reckless one.
+We could also inteprete this another way, by taking into account the heterogeneous nature of fouls. Fouls can either be soft, clumsy, slightly late, very late, or reckless, etc. If we then assume then that referees have eagle eye and consistently award yellow cards for fouls that are deserving of one, this __3%__ is actually, for players who committed a foul, the probability of them committing a reckless one.
 
 ```{r likelihood1}
 player_ratio %>%
   filter(fouls_to_yellow != "0:0" & substr(fouls_to_yellow,3,3) != "2") %>%
   mutate(group = ifelse(fouls_to_yellow == "1:1", "Yellow on First Foul", "No Yellow on First Foul")) %>%
   group_by(group) %>%
-  summarise(count = n()) %>%
+  summarise(count = sum(count)) %>%
     mutate(cumulative = cumsum(count),
          midpoint =  sum(count) - (cumulative - count/2)) %>%
   ggplot(aes(x = "", y = count, fill = group)) +
@@ -213,14 +213,14 @@ If one foul is all you are going to commit during the entire match, then the abo
 
 To estimate the probability of getting a yellow card, we now sub-sample to exclude those who committed less than 2 fouls in a match. 
 
-Based on the chart below, we find that the probability of you getting a yellow card on your second foul is significantly higher at __22%__. 
+Based on the chart below, we find that the probability of you getting a yellow card on your second foul is significantly higher at __21.3%__. What this implies is that referees have a very high tendency to be lenient on the first foul, but slightly less so for the second one.
 
 ```{r likelihood2}
 player_ratio %>%
   filter(as.numeric(substr(fouls_to_yellow,1,1)) > 1 & substr(fouls_to_yellow,3,3) != "2") %>%
   mutate(group = ifelse(fouls_to_yellow == "2:1", "Yellow on Second Foul", "No Yellow on Second Foul")) %>%
   group_by(group) %>%
-  summarise(count = n()) %>%
+  summarise(count = sum(count)) %>%
     mutate(cumulative = cumsum(count),
          midpoint =  sum(count) - (cumulative - count/2)) %>%
   ggplot(aes(x = "", y = count, fill = group)) +
@@ -233,14 +233,14 @@ player_ratio %>%
   geom_text(aes(y = midpoint, label = percent(count/sum(count))), size = 5)
 ```
 
-We repeat the same for the third (__30.3%__) and fourth (__39.2%__) fouls. Not surprisingly, the probabilities are increasing, which is not surprising because your name becomes more salient with the referee with each foul, and there comes a stage where the referee utimately decides to make you see yellow. However, do note that the probabilities cannot be compared with reference to each other, each situation is evaluated on its on (_conditional probabilites_).
+We repeat the same for the third (__36%__) and fourth (__45.3%__) fouls. Not surprisingly, the probabilities are increasing, which is not surprising because your name becomes more salient with the referee with each foul, and there comes a stage where the referee utimately decides to make you see yellow. However, do note that the probabilities cannot be compared with reference to each other, each situation is evaluated on its on (_conditional probabilites_).
 
 ```{r likelihood3}
 player_ratio %>%
   filter(as.numeric(substr(fouls_to_yellow,1,1)) > 2 & substr(fouls_to_yellow,3,3) != "2") %>%
   mutate(group = ifelse(fouls_to_yellow == "3:1", "Yellow on Third Foul", "No Yellow on Third Foul")) %>%
   group_by(group) %>%
-  summarise(count = n()) %>%
+  summarise(count = sum(count)) %>%
     mutate(cumulative = cumsum(count),
          midpoint =  sum(count) - (cumulative - count/2)) %>%
   ggplot(aes(x = "", y = count, fill = group)) +
@@ -259,7 +259,7 @@ player_ratio %>%
   filter(as.numeric(substr(fouls_to_yellow,1,1)) > 3 & substr(fouls_to_yellow,3,3) != "2") %>%
   mutate(group = ifelse(fouls_to_yellow == "4:1", "Yellow on Fourth Foul", "No Yellow on Fourth Foul")) %>%
   group_by(group) %>%
-  summarise(count = n()) %>%
+  summarise(count = sum(count)) %>%
     mutate(cumulative = cumsum(count),
          midpoint =  sum(count) - (cumulative - count/2)) %>%
   ggplot(aes(x = "", y = count, fill = group)) +
