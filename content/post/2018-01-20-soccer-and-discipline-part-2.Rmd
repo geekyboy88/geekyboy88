@@ -30,6 +30,10 @@ knitr::opts_chunk$set(warning=FALSE, echo=FALSE, comment=NA, message=FALSE)
 
 ### Soccer and Discipline - Part 2
 
+## POST UNDER CONSTRUCTION
+
+## Stay tune for updates!!!
+
 In my previous post, I approached soccer analytics from the discipline perspective, and tried to estimate what the probability of getting a yellow card is, on the condition that the referee calls it a foul in the first place. 
 
 To provide another perspective, this time round, I wanted to dig further to discover what other insights about disciplinary issues we can glean from the data.
@@ -40,6 +44,7 @@ library(RColorBrewer)
 library(ggplot2)
 library(knitr)
 library(scales)
+library(stringr)
 library(dplyr)
 ```
 
@@ -60,7 +65,14 @@ __Time__ is of the essence in a soccer match. There are, after all, only 90 minu
 
 __Timing__ is also important in the context of disciplinary issues in a soccer match. If you had committed a foul early, it is quite likely that the referee would take more notice of you and hence you may wish to thread more carefully. If you had received a yellow card, then you would have to take even more precaution given that getting a second yellow would result in your team being handled a numerical disadvantage. Well, lastly, if you had gotten a second yellow or red card early in the match, you'd probably be buying everyone a round of drinks after the match!
 
-To start off, we first look at the distribution of fouls, yellow cards, and red cards across the duration of the match.
+To start off, we first look at the distribution of fouls, yellow cards, and red cards across the duration of the match. From the charts, we can see that the number of fouls committed per minute almost mimics that of a uniform distribution, save for two key moments near the end of each half. 
+
+The distribution is slightly different for yellow cards, where we see a lower number of yellow cards awarded near the start of the match, and it gradually increases. The same two spikes similarly at the end of each half. The red card distribution chart is fairly sparse, so nothing much to highlight there.
+
+Overall, when looking at the distributions, a few questions may come to mind. 
+
+1. Firstly, are certain teams more susceptible to commit fouls or pick up yellow cards at certain points in the match?
+2. If so, does it matter what kind of match it is? For example, do we see more fouls and yellow cards from the onset for derby matches?
 
 ```{r time1}
 events %>%
@@ -100,14 +112,175 @@ events %>%
   scale_x_continuous(breaks = c(0,15,30,45,60,75,90,105), limits = c(0,105)) 
 ```
 
-### Are more fouls committed during Derby matches?
 
 ### Do particular teams tend to commit fouls at certain points in time during the match?
 
+Recall in the previous post that we had a chart ranking the EPL teams based on the number of fouls committed throughout the season. I will bring that out again for easy reference. 
+
+```{r teamfoul, message=FALSE, error=FALSE}
+events %<>%
+  mutate(time_range = cut(time, breaks = c(-1, 15, 30, 45, 60, 75, 105),
+                          labels = c("First 15 mins","16 to 30 mins","31 to half-time","46 to 60 mins","61 to 75 mins","76 mins to full-time")))
+
+events %>%
+  filter(event_type == "Foul") %>%
+  group_by(event_team) %>%
+  summarise(num = n()) %>%
+  ggplot(aes(x = reorder(event_team, num), y = num, fill = num)) +
+  geom_bar(position = position_dodge(), stat ="identity") +
+  scale_fill_gradient(low = "magenta1", high = "maroon") +
+  theme_classic() +
+  theme(legend.position = "none") +
+  labs(x = "EPL team", y = "Number of Fouls", title = "Number of Fouls by EPL Teams") +
+  coord_flip()
+```
+
+Next, we wish to find out when do the teams tend to commit their fouls. 
+
+This is a massive chart to be looking at as there is quite a lot of information to digest. Nevertheless, breaking it down, we see that:
+1. On average, teams tend to foul more in the second half. This could be due to fatigue, or teams getting more aggressive as they approach the end of the match.
+2. Just __eye-balling__ the purple bar, we can tell that this seems to be the largest bar of all (_to view it, avoid looking at the entire chart and focus on the split for each team_). Well, it is hardly surprising again, considering that, should the scoreline of the match be close enough, teams certainly have a lot to fight for and this sets the stage for the climax of the match.
+
+```{r teamfoul1, message=FALSE, error=FALSE}
+events %>%
+  group_by(time_range, event_team) %>%
+  summarise(count = n()) %>%
+  ggplot(aes(x = event_team, y = count, fill = time_range, group = time_range)) +
+  geom_bar(stat = "identity", position = position_fill()) +
+  coord_flip() +
+  theme_light() +
+  labs(x = "Team", fill = "Time Range", y = "Propotion of fouls committed in time range")
+```
+
+### Reasons for Fouling in the Last 15 Minutes
+
+So.. this leads me to my main question. I was curious to find out the reasons to why teams were committing fouls at the tail end of the match, and if the scoreline or the circumstances that they were in were anything to go by. Specifically, I wondered if teams that were in the lead were less likely to commit fouls as a result of good game management, or were they more likely to commit fouls because of the relentless waves of attack from the opposition that result in the team nervously going in for clumsy or late tackles.
+
+To do so, I first start off by again loading the entire dataset, and compile information at the match level. Because we have to take into account the reaction from the team's perspective, I subsequently converted it back to a team level data set to run the analyses.
+
+```{r teamfoul2, message=FALSE, error=FALSE}
+score = read.csv("../../static/data/events1.csv", stringsAsFactors = F)
+ginf = read.csv("../../static/data/ginf.csv", stringsAsFactors = F)
+score %<>% merge(ginf[,c(1, 4:9)], by = "id_odsp", all.x = T)
+rm(ginf)
+
+score_line_75 = score %>%
+  mutate(goal_75 = ifelse(time >= 75, 0, is_goal)) %>%
+  group_by(id_odsp, event_team) %>%
+  summarise(goals_75 = sum(goal_75)) %>%
+  group_by(id_odsp) %>%
+  summarise(teams = paste0(event_team, collapse = "-"),
+            score_75 = paste0(goals_75, collapse = "-"))
 
 
+score_line = score %>%
+  group_by(id_odsp, event_team) %>%
+  summarise(goals = sum(is_goal)) %>%
+  group_by(id_odsp) %>%
+  summarise(teams = paste0(event_team, collapse = "-"),
+            score_90 = paste0(goals, collapse = "-"))
 
 
+score_line = merge(score_line_75, score_line, by = c("id_odsp","teams"), all.x = T)
+rm(score_line_75)
+score_line %<>%
+  mutate(team_a = sub("-.*","", teams),
+         team_b = sub(".*-","", teams))
 
+fouls = events %>%
+  group_by(id_odsp, event_team) %>%
+  summarise(fouls = sum(ifelse(event_type == "Foul", 1, 0))) %>%
+  group_by(id_odsp) %>%
+  summarise(teams = paste0(event_team, collapse = "-"),
+            fouls = paste0(fouls, collapse = "-"))
 
+fouls_75 = events %>%
+  group_by(id_odsp, event_team) %>%
+  summarise(fouls_75 = sum(ifelse(event_type == "Foul" & time <= 75, 1, 0))) %>%
+  group_by(id_odsp) %>%
+  summarise(teams = paste0(event_team, collapse = "-"),
+            fouls_75 = paste0(fouls_75, collapse = "-"))
 
+fouls = merge(fouls_75, fouls, by = c("id_odsp","teams"), all.x = T)
+score_line = merge(score_line, fouls, by = c("id_odsp","teams"), all.x = T)
+rm(fouls)
+
+score_line %<>%
+  mutate(team_a_fouls_75 = sub("-.*","", fouls_75) %>% as.numeric(),
+         team_b_fouls_75 = sub(".*-","", fouls_75) %>% as.numeric(),
+         team_a_fouls_90 = sub("-.*","", fouls) %>% as.numeric(),
+         team_b_fouls_90 = sub(".*-","", fouls) %>% as.numeric(),
+         team_a_score_75 = sub("-.*","", score_75) %>% as.numeric(),
+         team_b_score_75 = sub(".*-","", score_75) %>% as.numeric(),
+         team_a_score_90 = sub("-.*","", score_90) %>% as.numeric(),
+         team_b_score_90 = sub(".*-","", score_90) %>% as.numeric(),
+         team_a_fouls_last15 = team_a_fouls_90 - team_a_fouls_75,
+         team_b_fouls_last15 = team_b_fouls_90 - team_b_fouls_75,
+         team_a_pers75 = team_a_score_75 - team_b_score_75,
+         team_b_pers75 = team_b_score_75 - team_a_score_75)
+
+data = score_line[,c(5,9,13,15,17,19)]
+data1 = score_line[,c(6,10,14,16,18,20)]
+names(data) = c("team","fouls_75","score_75","score_90","fouls_last15","pers75")
+names(data1) = c("team","fouls_75","score_75","score_90","fouls_last15","pers75")
+data = rbind(data, data1)
+rm(data1)
+```
+
+So moving on to the findings, I first run a regression to find out if the the current score line with reference to the team (_where +2 denotes that I am currently two goals in front, while -2 denotes that I am currently two goals behind_) affects the number of fouls I made in the last 15 minutes . From the regression results, you can tell that actually, __it doesn't really matter__. Being in front, behind, or on level terms with the opposition at the 75th minute of the match does not affect the number of fouls that you commit. 
+
+We then take a deeper look at the statistics by comparing the mean number of fouls committed in the last 15 minutes of the match based on the current score line. Note that I only filtered out for current positions +-/goals as the number of instances where a team is 3 goals up or behind is very low.
+
+Looking at the table below, we find that the mean number of fouls for +2 and -2 are pretty much about the same. However, if we look at the +1 to -1 space, we see a possible hint of some effect. Teams that are in the lead may be slightly more cautious, and hence commit an average of 2.15 fouls, 0.08 fouls lesser than teams that are behind at 2.23 fouls. 
+
+```{r teamfoul3}
+summary(lm(fouls_last15 ~ pers75 %>% as.factor(), 
+           data = data %>% filter(pers75 >=-2 & pers75 <= 2)))
+
+data %>%
+  filter(pers75 >=-2 & pers75 <= 2) %>%
+  group_by(pers75) %>%
+  summarise(mean_fouls = round(mean(fouls_last15),2))
+```
+
+### Most fouls when down/up by one goal
+
+Lastly, we do a quick dive into team effects. 
+
+When down by one goal, teams such as __Southampton, Manchester City and West Brom__ commit the most number of fouls, which may signal them taking more risks during the last 15 minutes of the match to find that equalising goal, and hence putting themselves into positions where they are susceptible to commit more fouls than they would have. 
+
+```{r teamfoul4}
+data %>%
+  filter(pers75 == -1) %>%
+  group_by(pers75, team) %>%
+  summarise(mean_fouls = round(mean(fouls_last15),2)) %>%
+  arrange(desc(mean_fouls)) %>%
+  head(10) %>%
+  kable()
+```
+
+When up by one goal, we find that teams such as __Aston Villa, Southampton, and Manchester United__ are guilty of committing more fouls. This could be due to them taking a defensive approach to the last 15 minutes of the match as they look to secure the win. This could have led to them committing more fouls as they attempt to breakup play as much as they can.
+
+```{r teamfoul5}
+data %>%
+  filter(pers75 == 1) %>%
+  group_by(pers75, team) %>%
+  summarise(mean_fouls = round(mean(fouls_last15),2)) %>%
+  arrange(desc(mean_fouls)) %>%
+  head(10) %>%
+  kable()
+
+```
+
+When odds are even, we see teams such as __Tottenham, Manchester United, and Watford__ committing more fouls in the last 15 minutes as they attempt to chase the winning goal in the game, leaving themselves open to counter attacks which inadvertently leads them to commit more fouls to break up these attacks.
+
+```{r teamfoul6}
+data %>%
+  filter(pers75 == 0) %>%
+  group_by(pers75, team) %>%
+  summarise(mean_fouls = round(mean(fouls_last15),2)) %>%
+  arrange(desc(mean_fouls)) %>%
+  head(10) %>%
+  kable()
+
+```

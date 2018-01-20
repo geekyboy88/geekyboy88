@@ -27,19 +27,261 @@ pre {
 </style>
 <div id="soccer-and-discipline---part-2" class="section level3">
 <h3>Soccer and Discipline - Part 2</h3>
+</div>
+<div id="post-under-construction" class="section level2">
+<h2>POST UNDER CONSTRUCTION</h2>
+</div>
+<div id="stay-tune-for-updates" class="section level2">
+<h2>Stay tune for updates!!!</h2>
 <p>In my previous post, I approached soccer analytics from the discipline perspective, and tried to estimate what the probability of getting a yellow card is, on the condition that the referee calls it a foul in the first place.</p>
 <p>To provide another perspective, this time round, I wanted to dig further to discover what other insights about disciplinary issues we can glean from the data.</p>
-</div>
 <div id="timing-of-fouls" class="section level3">
 <h3>Timing of fouls</h3>
 <p><strong>Time</strong> is of the essence in a soccer match. There are, after all, only 90 minutes + stoppage time, for the players to materialise everything that they had put in in training for the past week. Depending on the circumstances, some may find that that the 90 minutes is <strong>too long</strong>, while for others, time may be <strong>insufficient</strong>.</p>
 <p><strong>Timing</strong> is also important in the context of disciplinary issues in a soccer match. If you had committed a foul early, it is quite likely that the referee would take more notice of you and hence you may wish to thread more carefully. If you had received a yellow card, then you would have to take even more precaution given that getting a second yellow would result in your team being handled a numerical disadvantage. Well, lastly, if you had gotten a second yellow or red card early in the match, you’d probably be buying everyone a round of drinks after the match!</p>
-<p>To start off, we first look at the distribution of fouls, yellow cards, and red cards across the duration of the match.</p>
+<p>To start off, we first look at the distribution of fouls, yellow cards, and red cards across the duration of the match. From the charts, we can see that the number of fouls committed per minute almost mimics that of a uniform distribution, save for two key moments near the end of each half.</p>
+<p>The distribution is slightly different for yellow cards, where we see a lower number of yellow cards awarded near the start of the match, and it gradually increases. The same two spikes similarly at the end of each half. The red card distribution chart is fairly sparse, so nothing much to highlight there.</p>
+<p>Overall, when looking at the distributions, a few questions may come to mind.</p>
+<ol style="list-style-type: decimal">
+<li>Firstly, are certain teams more susceptible to commit fouls or pick up yellow cards at certain points in the match?</li>
+<li>If so, does it matter what kind of match it is? For example, do we see more fouls and yellow cards from the onset for derby matches?</li>
+</ol>
 <p><img src="/post/2018-01-20-soccer-and-discipline-part-2_files/figure-html/time1-1.png" width="672" /><img src="/post/2018-01-20-soccer-and-discipline-part-2_files/figure-html/time1-2.png" width="672" /><img src="/post/2018-01-20-soccer-and-discipline-part-2_files/figure-html/time1-3.png" width="672" /></p>
-</div>
-<div id="are-more-fouls-committed-during-derby-matches" class="section level3">
-<h3>Are more fouls committed during Derby matches?</h3>
 </div>
 <div id="do-particular-teams-tend-to-commit-fouls-at-certain-points-in-time-during-the-match" class="section level3">
 <h3>Do particular teams tend to commit fouls at certain points in time during the match?</h3>
+<p>Recall in the previous post that we had a chart ranking the EPL teams based on the number of fouls committed throughout the season. I will bring that out again for easy reference.</p>
+<p><img src="/post/2018-01-20-soccer-and-discipline-part-2_files/figure-html/teamfoul-1.png" width="672" /></p>
+<p>Next, we wish to find out when do the teams tend to commit their fouls.</p>
+<p>This is a massive chart to be looking at as there is quite a lot of information to digest. Nevertheless, breaking it down, we see that: 1. On average, teams tend to foul more in the second half. This could be due to fatigue, or teams getting more aggressive as they approach the end of the match. 2. Just <strong>eye-balling</strong> the purple bar, we can tell that this seems to be the largest bar of all (<em>to view it, avoid looking at the entire chart and focus on the split for each team</em>). Well, it is hardly surprising again, considering that, should the scoreline of the match be close enough, teams certainly have a lot to fight for and this sets the stage for the climax of the match.</p>
+<p><img src="/post/2018-01-20-soccer-and-discipline-part-2_files/figure-html/teamfoul1-1.png" width="672" /></p>
+</div>
+<div id="reasons-for-fouling-in-the-last-15-minutes" class="section level3">
+<h3>Reasons for Fouling in the Last 15 Minutes</h3>
+<p>So.. this leads me to my main question. I was curious to find out the reasons to why teams were committing fouls at the tail end of the match, and if the scoreline or the circumstances that they were in were anything to go by. Specifically, I wondered if teams that were in the lead were less likely to commit fouls as a result of good game management, or were they more likely to commit fouls because of the relentless waves of attack from the opposition that result in the team nervously going in for clumsy or late tackles.</p>
+<p>To do so, I first start off by again loading the entire dataset, and compile information at the match level. Because we have to take into account the reaction from the team’s perspective, I subsequently converted it back to a team level data set to run the analyses.</p>
+<p>So moving on to the findings, I first run a regression to find out if the the current score line with reference to the team (<em>where +2 denotes that I am currently two goals in front, while -2 denotes that I am currently two goals behind</em>) affects the number of fouls I made in the last 15 minutes . From the regression results, you can tell that actually, <strong>it doesn’t really matter</strong>. Being in front, behind, or on level terms with the opposition at the 75th minute of the match does not affect the number of fouls that you commit.</p>
+<p>We then take a deeper look at the statistics by comparing the mean number of fouls committed in the last 15 minutes of the match based on the current score line. Note that I only filtered out for current positions +-/goals as the number of instances where a team is 3 goals up or behind is very low.</p>
+<p>Looking at the table below, we find that the mean number of fouls for +2 and -2 are pretty much about the same. However, if we look at the +1 to -1 space, we see a possible hint of some effect. Teams that are in the lead may be slightly more cautious, and hence commit an average of 2.15 fouls, 0.08 fouls lesser than teams that are behind at 2.23 fouls.</p>
+<pre><code>
+Call:
+lm(formula = fouls_last15 ~ pers75 %&gt;% as.factor(), data = data %&gt;% 
+    filter(pers75 &gt;= -2 &amp; pers75 &lt;= 2))
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-2.2293 -1.1727 -0.1727  0.8273  5.7794 
+
+Coefficients:
+                         Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)               2.20588    0.17070  12.923   &lt;2e-16 ***
+pers75 %&gt;% as.factor()-1  0.02342    0.20435   0.115    0.909    
+pers75 %&gt;% as.factor()0  -0.03316    0.19531  -0.170    0.865    
+pers75 %&gt;% as.factor()1  -0.05939    0.20435  -0.291    0.771    
+pers75 %&gt;% as.factor()2   0.01471    0.24140   0.061    0.951    
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+Residual standard error: 1.408 on 665 degrees of freedom
+Multiple R-squared:  0.0005185, Adjusted R-squared:  -0.005493 
+F-statistic: 0.08624 on 4 and 665 DF,  p-value: 0.9867</code></pre>
+<pre><code># A tibble: 5 x 2
+  pers75 mean_fouls
+   &lt;dbl&gt;      &lt;dbl&gt;
+1     -2       2.21
+2     -1       2.23
+3      0       2.17
+4      1       2.15
+5      2       2.22</code></pre>
+</div>
+<div id="most-fouls-when-downup-by-one-goal" class="section level3">
+<h3>Most fouls when down/up by one goal</h3>
+<p>Lastly, we do a quick dive into team effects.</p>
+<p>When down by one goal, teams such as <strong>Southampton, Manchester City and West Brom</strong> commit the most number of fouls, which may signal them taking more risks during the last 15 minutes of the match to find that equalising goal, and hence putting themselves into positions where they are susceptible to commit more fouls than they would have.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right">pers75</th>
+<th align="left">team</th>
+<th align="right">mean_fouls</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">-1</td>
+<td align="left">Southampton</td>
+<td align="right">3.14</td>
+</tr>
+<tr class="even">
+<td align="right">-1</td>
+<td align="left">Manchester City</td>
+<td align="right">2.80</td>
+</tr>
+<tr class="odd">
+<td align="right">-1</td>
+<td align="left">West Brom</td>
+<td align="right">2.58</td>
+</tr>
+<tr class="even">
+<td align="right">-1</td>
+<td align="left">Arsenal</td>
+<td align="right">2.50</td>
+</tr>
+<tr class="odd">
+<td align="right">-1</td>
+<td align="left">Aston Villa</td>
+<td align="right">2.50</td>
+</tr>
+<tr class="even">
+<td align="right">-1</td>
+<td align="left">Stoke City</td>
+<td align="right">2.50</td>
+</tr>
+<tr class="odd">
+<td align="right">-1</td>
+<td align="left">Watford</td>
+<td align="right">2.50</td>
+</tr>
+<tr class="even">
+<td align="right">-1</td>
+<td align="left">Newcastle</td>
+<td align="right">2.43</td>
+</tr>
+<tr class="odd">
+<td align="right">-1</td>
+<td align="left">Crystal Palace</td>
+<td align="right">2.40</td>
+</tr>
+<tr class="even">
+<td align="right">-1</td>
+<td align="left">Chelsea</td>
+<td align="right">2.36</td>
+</tr>
+</tbody>
+</table>
+<p>When up by one goal, we find that teams such as <strong>Aston Villa, Southampton, and Manchester United</strong> are guilty of committing more fouls. This could be due to them taking a defensive approach to the last 15 minutes of the match as they look to secure the win. This could have led to them committing more fouls as they attempt to breakup play as much as they can.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right">pers75</th>
+<th align="left">team</th>
+<th align="right">mean_fouls</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="left">Aston Villa</td>
+<td align="right">3.25</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="left">Southampton</td>
+<td align="right">3.25</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="left">Manchester Utd</td>
+<td align="right">2.67</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="left">Crystal Palace</td>
+<td align="right">2.60</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="left">Manchester City</td>
+<td align="right">2.50</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="left">Leicester City</td>
+<td align="right">2.36</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="left">Tottenham</td>
+<td align="right">2.29</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="left">Norwich City</td>
+<td align="right">2.25</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="left">Arsenal</td>
+<td align="right">2.20</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="left">West Ham</td>
+<td align="right">2.14</td>
+</tr>
+</tbody>
+</table>
+<p>When odds are even, we see teams such as <strong>Tottenham, Manchester United, and Watford</strong> committing more fouls in the last 15 minutes as they attempt to chase the winning goal in the game, leaving themselves open to counter attacks which inadvertently leads them to commit more fouls to break up these attacks.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right">pers75</th>
+<th align="left">team</th>
+<th align="right">mean_fouls</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0</td>
+<td align="left">Tottenham</td>
+<td align="right">3.20</td>
+</tr>
+<tr class="even">
+<td align="right">0</td>
+<td align="left">Manchester Utd</td>
+<td align="right">2.92</td>
+</tr>
+<tr class="odd">
+<td align="right">0</td>
+<td align="left">Watford</td>
+<td align="right">2.82</td>
+</tr>
+<tr class="even">
+<td align="right">0</td>
+<td align="left">Liverpool</td>
+<td align="right">2.62</td>
+</tr>
+<tr class="odd">
+<td align="right">0</td>
+<td align="left">West Brom</td>
+<td align="right">2.50</td>
+</tr>
+<tr class="even">
+<td align="right">0</td>
+<td align="left">Manchester City</td>
+<td align="right">2.44</td>
+</tr>
+<tr class="odd">
+<td align="right">0</td>
+<td align="left">Leicester City</td>
+<td align="right">2.40</td>
+</tr>
+<tr class="even">
+<td align="right">0</td>
+<td align="left">Crystal Palace</td>
+<td align="right">2.15</td>
+</tr>
+<tr class="odd">
+<td align="right">0</td>
+<td align="left">Chelsea</td>
+<td align="right">2.12</td>
+</tr>
+<tr class="even">
+<td align="right">0</td>
+<td align="left">Stoke City</td>
+<td align="right">2.11</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
