@@ -118,13 +118,19 @@ pre {
 </div>
 <div id="how-does-the-opponent-react" class="section level3">
 <h3>How does the opponent react?</h3>
+<p>Next, let us take a quick look at how the <strong>black player</strong> reacts depending on the move that the first player makes. We visualize this with a simple sankey chart using the <em>googleVis</em> package.</p>
+<p>There’s quite a lot of information in this chart, so let’s break it down into a few parts:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Red Player Moves Cannon</strong> - There are two main reactions to this move, given that the black player’s Pawn in position 5 is now under threat. The black player either makes a defensive move by moving his <strong>Horse</strong> to protect the Pawn, or chooses to make a “<em>copycat</em>” offensive move by moving the cannon to a similar position. We also see some instances where the black player moves the elephant, but one wonders the reason behind this move given that this would mean that the Pawn in position 5 would be eaten.</li>
+<li><strong>Red Player moves Elephant, Pawn or Horse</strong> - We also see that should the red player choose to move an altenrative piece other than the cannon, the <strong>black player</strong> takes advantage of this by taking this opportunity to put the <strong>red player</strong> under some pressure by moving the cannon.</li>
+</ol>
 <!-- Sankey generated in R 3.4.0 by googleVis 0.6.2 package -->
-<!-- Sun Jan 28 17:54:18 2018 -->
+<!-- Sun Jan 28 18:53:05 2018 -->
 <!-- jsHeader -->
 <script type="text/javascript">
  
 // jsData 
-function gvisDataSankeyID18be56579816 () {
+function gvisDataSankeyID202e3bb5fd14 () {
 var data = new google.visualization.DataTable();
 var datajson =
 [
@@ -312,14 +318,14 @@ return(data);
 }
  
 // jsDrawChart
-function drawChartSankeyID18be56579816() {
-var data = gvisDataSankeyID18be56579816();
+function drawChartSankeyID202e3bb5fd14() {
+var data = gvisDataSankeyID202e3bb5fd14();
 var options = {};
 options["width"] = 400;
 options["height"] = 400;
 
     var chart = new google.visualization.Sankey(
-    document.getElementById('SankeyID18be56579816')
+    document.getElementById('SankeyID202e3bb5fd14')
     );
     chart.draw(data,options);
     
@@ -343,9 +349,9 @@ if (newPackage)
   pkgs.push(chartid);
   
 // Add the drawChart function to the global list of callbacks
-callbacks.push(drawChartSankeyID18be56579816);
+callbacks.push(drawChartSankeyID202e3bb5fd14);
 })();
-function displayChartSankeyID18be56579816() {
+function displayChartSankeyID202e3bb5fd14() {
   var pkgs = window.__gvisPackages = window.__gvisPackages || [];
   var callbacks = window.__gvisCallbacks = window.__gvisCallbacks || [];
   window.clearTimeout(window.__gvisLoad);
@@ -368,12 +374,17 @@ callbacks.shift()();
 // jsFooter
 </script>
 <!-- jsChart -->
-<script type="text/javascript" src="https://www.google.com/jsapi?callback=displayChartSankeyID18be56579816"></script>
+<script type="text/javascript" src="https://www.google.com/jsapi?callback=displayChartSankeyID202e3bb5fd14"></script>
 <!-- divChart -->
-<div id="SankeyID18be56579816" style="width: 400; height: 400;">
+<div id="SankeyID202e3bb5fd14" style="width: 400; height: 400;">
 
 </div>
-<p><img src="/post/2018-01-27-chinese-new-year-chinese-chess_files/figure-html/secondmove3-1.png" width="672" /></p>
+</div>
+<div id="so-does-your-first-move-matter" class="section level3">
+<h3>So… does your first move matter?</h3>
+<p>Next, based on just the first moves of each player, let’s see if its possible to tell if there’s a clear winner.</p>
+<p>From the chart below, its not surprising to see that the first moves are not telling of a winner,</p>
+<p><img src="/post/2018-01-27-chinese-new-year-chinese-chess_files/figure-html/secondmove2-1.png" width="672" /></p>
 <p>Data source obtained from <a href="https://www.kaggle.com/">Kaggle</a>. Credit to Alin Secareanu for compiling this amazing dataset. Data can be accessed from this <a href="https://www.kaggle.com/boyofans/onlinexiangqi/data">link</a>.</p>
 </div>
 </div>
