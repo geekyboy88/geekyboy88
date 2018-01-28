@@ -1,0 +1,379 @@
+---
+title: Chinese New Year Chinese Chess
+author: geekyboy88
+date: '2018-01-27'
+slug: chinese-new-year-chinese-chess
+categories:
+  - R
+  - Chinese
+  - Chess
+tags:
+  - R
+  - Chinese
+  - Chess
+---
+
+
+
+<style type="text/css">
+
+body, td {
+   font-size: 18px;
+}
+code.r{
+  font-size: 18px;
+}
+pre {
+  font-size: 18px
+}
+</style>
+<div id="chinese-new-year-chinese-chess" class="section level2">
+<h2>Chinese New Year Chinese Chess?</h2>
+<p>Hi again! As of the time of this post, we are fast approaching the month of February. What awaits us in February is a long holiday which some of us folks will celebrate, <strong>Chinese New Year!!</strong> So in light of the coming festivities, I thought I could do something (<em>related to</em>) <strong>Chinese</strong>, but not so much the <strong>New Year!</strong></p>
+<p>And so I stumbled upon a rather interesting <a href="https://www.kaggle.com/boyofans/onlinexiangqi/data">dataset</a>. This dataset contains close to 10,000 games of an online version of <a href="https://en.wikipedia.org/wiki/Xiangqi"><strong>Chinese Chess</strong></a>.</p>
+<p>The dataset is split into two parts. The first dataset contains game-level information, such as the players information, who the winner is. The second dataset contains move information for each game.</p>
+<pre><code>[1] &quot;   gameID  game_datetime         blackID          blackELO  redID            redELO  winner &quot;
+[2] &quot;---------  --------------------  --------------  ---------  --------------  -------  -------&quot;
+[3] &quot; 57380690  2017-02-10 13:11:10   levinhson            1382  baochang           1495  red    &quot;
+[4] &quot; 57380691  2017-02-10 13:21:43   phucnguyen           1269  quanem             1282  red    &quot;
+[5] &quot; 57380692  2017-02-10 13:23:04   pgm2785g             1253  swf2016g           1186  black  &quot;
+[6] &quot; 57380693  2017-02-10 13:09:58   cbk4833g             1209  ftc484g            1426  black  &quot;</code></pre>
+<pre><code>[1] &quot;   gameID   turn  side    move &quot; &quot;---------  -----  ------  -----&quot;
+[3] &quot; 57380690      1  red     C2.5 &quot; &quot; 57380690      2  red     H2+3 &quot;
+[5] &quot; 57380690      3  red     R1.2 &quot; &quot; 57380690      4  red     P7+1 &quot;</code></pre>
+<p>To start off, let’s assume that <strong>red</strong> always move <strong>first</strong>, and investigate if starting first necessarily leads to a win!</p>
+<p>From the chart below, well, it does seem that starting first has its advantage, but is it really the case?</p>
+<p><img src="/post/2018-01-27-chinese-new-year-chinese-chess_files/figure-html/game1-1.png" width="672" /></p>
+<p>To start off, let’s first take a look at the <strong>number of moves</strong> (<em>in total</em>) that were taken for each game!</p>
+<p>Interestingly, from the chart below, we see a spike at 1 move. Come to think of it, its hardly surprising considering that the game is played on the web, and there is minimal entry requirement and literally zero exit restriction (<em>you can literally leave anytime during the match</em>).</p>
+<p><img src="/post/2018-01-27-chinese-new-year-chinese-chess_files/figure-html/game2-1.png" width="672" /></p>
+<p>And so, our next step is to remove games which are obviously not meaningful from our data (i.e. games where players exit before its meaningful to even make a move to win_). But first, we would need to find out what the minimum number of moves one player can make to win is. Well, the answer is <strong>4!!</strong> A double cannon move that traps the <strong>king</strong> in its position and both its <strong>advisors</strong> are not in a good position to defend it. Even then, looking at the data on the moves for games where either player makes only 4 moves, we do not find any evidence of such a case happening.</p>
+<p>So, to arbitarily filter off games where there are early quitters (<em>who are possibly noobs</em>), I decided to set the cut-off at 20 (<em>for total number of moves</em>).</p>
+<p>Starting the match right is always important, for any player of any skill level. So, as a first move (<em>punt intended</em>), I thougth we could look at what are the most popular first moves. Note that because chinese chess is a <strong>turn-based</strong> move, it is only right that we focus on the first move by the red player, and not the black player, as the black player’s move is likely to be in respond to the red player’s first move.</p>
+<p>But before we move on to the chart below, let’s go through the notations used for the moves.</p>
+<p>First, the <strong>alphabets</strong> stand for the pieces themselves:</p>
+<ul>
+<li>K - King</li>
+<li>A - Advisor (<em>pieces next to the king</em>)</li>
+<li>E - Elephant</li>
+<li>H - Horse</li>
+<li>R - Car</li>
+<li>C - Cannon</li>
+<li>P - Pawn</li>
+</ul>
+<p>Second, there are typically two numbers in the notation, where both numbers correspond to the <strong>location</strong> on the board, with 1 on the right and 9 on the left for each player. The first number correspond to the current location of that piece, and the second notation refers to the location on the board that this piece will move to.</p>
+<p>Lastly, there are three symbols that help to identify the kind of move that the piece is making, namely, <strong>+</strong> (<em>plus sign</em>), <strong>-</strong> (<em>minus sign</em>), and <strong>.</strong> (<em>full stop</em>). The + sign is a movement forward on the board (<em>or into enemy territory</em>), while the - sign is a movement backward on the board, and . is a horizontal movement on the board.</p>
+<div id="red-players-first-move" class="section level3">
+<h3>Red Player’s First Move</h3>
+<p>From the chart below, we find that the top two most common first moves of the red player involve the movement of either one of the <strong>Cannons</strong> to the centre of the board.</p>
+<p><img src="/post/2018-01-27-chinese-new-year-chinese-chess_files/figure-html/firstmove1-1.png" width="672" /></p>
+<p>In fact, the <strong>Cannon</strong> is the first piece that is moved almost <strong>68%</strong> of the time by the red player, and within the context of the game, this is likely to be taken as an offensive move as it immediately puts pressure on the opponent’s <em>Pawn</em> in the 5th position. Right behind at <strong>11%</strong> is the movement of the <strong>elephant</strong>, which is likely to be viewed as a defensive move (<em>given that the elephant is not able to cross the river</em>). We also see the movement of the <strong>Pawn</strong> and <strong>Horse</strong>, with both coming in at about 9% each of all first moves.</p>
+<p>It doesn’t make any practical sense to be moving the rest of the chess pieces for your first move, so I think we can safely ignore these and move on.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Piece Moved</th>
+<th align="right">Number</th>
+<th align="right">Percentage</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">C</td>
+<td align="right">6470</td>
+<td align="right">0.68</td>
+</tr>
+<tr class="even">
+<td align="left">E</td>
+<td align="right">1088</td>
+<td align="right">0.11</td>
+</tr>
+<tr class="odd">
+<td align="left">P</td>
+<td align="right">903</td>
+<td align="right">0.09</td>
+</tr>
+<tr class="even">
+<td align="left">H</td>
+<td align="right">831</td>
+<td align="right">0.09</td>
+</tr>
+<tr class="odd">
+<td align="left">A</td>
+<td align="right">214</td>
+<td align="right">0.02</td>
+</tr>
+<tr class="even">
+<td align="left">R</td>
+<td align="right">32</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="odd">
+<td align="left">K</td>
+<td align="right">4</td>
+<td align="right">0.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="how-does-the-opponent-react" class="section level3">
+<h3>How does the opponent react?</h3>
+<!-- Sankey generated in R 3.4.0 by googleVis 0.6.2 package -->
+<!-- Sun Jan 28 17:54:18 2018 -->
+<!-- jsHeader -->
+<script type="text/javascript">
+ 
+// jsData 
+function gvisDataSankeyID18be56579816 () {
+var data = new google.visualization.DataTable();
+var datajson =
+[
+ [
+"Cannon",
+"horse",
+2848
+],
+[
+"Cannon",
+"cannon",
+2484
+],
+[
+"Cannon",
+"elephant",
+814
+],
+[
+"Elephant",
+"cannon",
+752
+],
+[
+"Pawn",
+"cannon",
+544
+],
+[
+"Horse",
+"cannon",
+418
+],
+[
+"Horse",
+"pawn",
+258
+],
+[
+"Cannon",
+"queen",
+205
+],
+[
+"Pawn",
+"pawn",
+174
+],
+[
+"Queen",
+"cannon",
+123
+],
+[
+"Elephant",
+"horse",
+120
+],
+[
+"Pawn",
+"elephant",
+101
+],
+[
+"Elephant",
+"pawn",
+100
+],
+[
+"Cannon",
+"pawn",
+87
+],
+[
+"Elephant",
+"elephant",
+86
+],
+[
+"Horse",
+"elephant",
+76
+],
+[
+"Pawn",
+"horse",
+68
+],
+[
+"Horse",
+"horse",
+60
+],
+[
+"Queen",
+"elephant",
+31
+],
+[
+"Car",
+"cannon",
+29
+],
+[
+"Cannon",
+"car",
+28
+],
+[
+"Elephant",
+"queen",
+28
+],
+[
+"Queen",
+"horse",
+28
+],
+[
+"Queen",
+"pawn",
+26
+],
+[
+"Horse",
+"queen",
+19
+],
+[
+"Pawn",
+"queen",
+15
+],
+[
+"Queen",
+"queen",
+6
+],
+[
+"Cannon",
+"king",
+4
+],
+[
+"Car",
+"queen",
+2
+],
+[
+"Elephant",
+"king",
+2
+],
+[
+"King",
+"elephant",
+2
+],
+[
+"Car",
+"horse",
+1
+],
+[
+"King",
+"cannon",
+1
+],
+[
+"King",
+"horse",
+1
+],
+[
+"Pawn",
+"car",
+1
+] 
+];
+data.addColumn('string','piece_moved.x');
+data.addColumn('string','piece_moved.y');
+data.addColumn('number','count');
+data.addRows(datajson);
+return(data);
+}
+ 
+// jsDrawChart
+function drawChartSankeyID18be56579816() {
+var data = gvisDataSankeyID18be56579816();
+var options = {};
+options["width"] = 400;
+options["height"] = 400;
+
+    var chart = new google.visualization.Sankey(
+    document.getElementById('SankeyID18be56579816')
+    );
+    chart.draw(data,options);
+    
+
+}
+  
+ 
+// jsDisplayChart
+(function() {
+var pkgs = window.__gvisPackages = window.__gvisPackages || [];
+var callbacks = window.__gvisCallbacks = window.__gvisCallbacks || [];
+var chartid = "sankey";
+  
+// Manually see if chartid is in pkgs (not all browsers support Array.indexOf)
+var i, newPackage = true;
+for (i = 0; newPackage && i < pkgs.length; i++) {
+if (pkgs[i] === chartid)
+newPackage = false;
+}
+if (newPackage)
+  pkgs.push(chartid);
+  
+// Add the drawChart function to the global list of callbacks
+callbacks.push(drawChartSankeyID18be56579816);
+})();
+function displayChartSankeyID18be56579816() {
+  var pkgs = window.__gvisPackages = window.__gvisPackages || [];
+  var callbacks = window.__gvisCallbacks = window.__gvisCallbacks || [];
+  window.clearTimeout(window.__gvisLoad);
+  // The timeout is set to 100 because otherwise the container div we are
+  // targeting might not be part of the document yet
+  window.__gvisLoad = setTimeout(function() {
+  var pkgCount = pkgs.length;
+  google.load("visualization", "1", { packages:pkgs, callback: function() {
+  if (pkgCount != pkgs.length) {
+  // Race condition where another setTimeout call snuck in after us; if
+  // that call added a package, we must not shift its callback
+  return;
+}
+while (callbacks.length > 0)
+callbacks.shift()();
+} });
+}, 100);
+}
+ 
+// jsFooter
+</script>
+<!-- jsChart -->
+<script type="text/javascript" src="https://www.google.com/jsapi?callback=displayChartSankeyID18be56579816"></script>
+<!-- divChart -->
+<div id="SankeyID18be56579816" style="width: 400; height: 400;">
+
+</div>
+<p><img src="/post/2018-01-27-chinese-new-year-chinese-chess_files/figure-html/secondmove3-1.png" width="672" /></p>
+<p>Data source obtained from <a href="https://www.kaggle.com/">Kaggle</a>. Credit to Alin Secareanu for compiling this amazing dataset. Data can be accessed from this <a href="https://www.kaggle.com/boyofans/onlinexiangqi/data">link</a>.</p>
+</div>
+</div>

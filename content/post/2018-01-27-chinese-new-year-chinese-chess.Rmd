@@ -1,0 +1,236 @@
+---
+title: Chinese New Year Chinese Chess
+author: geekyboy88
+date: '2018-01-27'
+slug: chinese-new-year-chinese-chess
+categories:
+  - R
+  - Chinese
+  - Chess
+tags:
+  - R
+  - Chinese
+  - Chess
+---
+
+<style type="text/css">
+
+body, td {
+   font-size: 18px;
+}
+code.r{
+  font-size: 18px;
+}
+pre {
+  font-size: 18px
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning=FALSE, echo=FALSE, comment=NA, message=FALSE)
+```
+
+## Chinese New Year Chinese Chess?
+
+Hi again! As of the time of this post, we are fast approaching the month of February. What awaits us in February is a long holiday which some of us folks will celebrate, __Chinese New Year!!__ So in light of the coming festivities, I thought I could do something (_related to_) __Chinese__, but not so much the __New Year!__
+
+And so I stumbled upon a rather interesting [dataset](https://www.kaggle.com/boyofans/onlinexiangqi/data). This dataset contains close to 10,000 games of an online version of [__Chinese Chess__ ](https://en.wikipedia.org/wiki/Xiangqi). 
+
+The dataset is split into two parts. The first dataset contains game-level information, such as the players information, who the winner is. The second dataset contains move information for each game.
+
+```{r loadpackages, message=FALSE, warning=FALSE}
+library(magrittr)
+library(RColorBrewer)
+library(ggplot2)
+library(googleVis)
+library(knitr)
+library(scales)
+library(dplyr)
+```
+
+```{r loaddata1}
+game = read.csv("../../static/data/gameinfo.csv", stringsAsFactors = F)
+moves = read.csv("../../static/data/moves.csv", stringsAsFactors = F)
+
+head(kable(game))
+```
+
+```{r loaddata2}
+head(kable(moves))
+```
+
+To start off, let's assume that __red__ always move __first__, and investigate if starting first necessarily leads to a win!
+
+From the chart below, well, it does seem that starting first has its advantage, but is it really the case?
+
+```{r game1}
+game %>%
+  group_by(winner) %>%
+  summarise(count = n()) %>%
+  mutate(pct = round(count / sum(count),2)) %>%
+  arrange(desc(pct)) %>%
+  ggplot(aes(x = "", y = pct, fill = winner)) +
+  geom_bar(stat = "identity") +
+  coord_polar("y", start = 0) +
+  scale_fill_manual(values = c("black","blue","red")) +
+  labs(title = "Percentage of wins by player colour", fill = "Outcome",x = "", y = "") +
+  theme_light() +
+  theme(legend.position = "bottom")
+```
+
+To start off, let's first take a look at the __number of moves__ (_in total_) that were taken for each game! 
+
+Interestingly, from the chart below, we see a spike at 1 move. Come to think of it, its hardly surprising considering that the game is played on the web, and there is minimal entry requirement and literally zero exit restriction (_you can literally leave anytime during the match_). 
+
+```{r game2}
+game1 = moves %>%
+  group_by(gameID) %>%
+  summarise(num_move = n(),
+            num_move_red = sum(ifelse(side == "red", 1, 0)),
+            num_move_black = sum(ifelse(side == "black", 1, 0))) 
+
+game1 %>%
+  group_by(num_move) %>%
+  summarise(count = n()) %>%
+  ggplot(aes(x = num_move, y = count, fill = "brickred1")) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_light() +
+  theme(legend.position = "none") +
+  labs(x = "Number of Moves", y = "Number of Games", title = "Distribution of games by number of moves") 
+```
+
+And so, our next step is to remove games which are obviously not meaningful from our data (i.e. games where players exit before its meaningful to even make a move to win_). But first, we would need to find out what the minimum number of moves one player can make to win is. Well, the answer is __4!!__ A double cannon move that traps the __king__ in its position and both its __advisors__ are not in a good position to defend it. Even then, looking at the data on the moves for games where either player makes only 4 moves, we do not find any evidence of such a case happening.
+
+So, to arbitarily filter off games where there are early quitters (_who are possibly noobs_), I decided to set the cut-off at 20 (_for total number of moves_).
+
+```{r game3}
+game %<>% merge(game1, by = "gameID", all.x = T)
+rm(game1)
+
+game %<>%
+  filter(is.na(num_move) == F & num_move >= 20)
+moves %<>%
+  filter(gameID %in% game$gameID)
+```
+
+Starting the match right is always important, for any player of any skill level. So, as a first move (_punt intended_), I thougth we could look at what are the most popular first moves. Note that because chinese chess is a __turn-based__ move, it is only right that we focus on the first move by the red player, and not the black player, as the black player's move is likely to be in respond to the red player's first move.
+
+But before we move on to the chart below, let's go through the notations used for the moves.
+
+First, the __alphabets__ stand for the pieces themselves:
+
+* K - King
+* A - Advisor (_pieces next to the king_)
+* E - Elephant
+* H - Horse
+* R - Car
+* C - Cannon
+* P - Pawn
+
+Second, there are typically two numbers in the notation, where both numbers correspond to the __location__ on the board, with 1 on the right and 9 on the left for each player. The first number correspond to the current location of that piece, and the second notation refers to the location on the board that this piece will move to.
+
+Lastly, there are three symbols that help to identify the kind of move that the piece is making, namely, __+__ (_plus sign_), __-__ (_minus sign_), and __.__ (_full stop_). The + sign is a movement forward on the board (_or into enemy territory_), while the - sign is a movement backward on the board, and . is a horizontal movement on the board.
+
+### Red Player's First Move
+
+From the chart below, we find that the top two most common first moves of the red player involve the movement of either one of the __Cannons__ to the centre of the board. 
+
+```{r firstmove1}
+moves %>%
+  filter(turn == 1 & side == "red") %>%
+  group_by(move) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count)) %>%
+  head(10) %>%
+  ggplot(aes(x = reorder(move, count), y = count, fill = count)) +
+  geom_bar(stat = "identity") +
+  theme_light() +
+  labs(x = "Move", y = "Number of Occurances", title = "Top 10 First Moves by Red Player") +
+  scale_fill_continuous(high = "red", low = "green") +
+  coord_flip() 
+```
+
+In fact, the __Cannon__ is the first piece that is moved almost __68%__ of the time by the red player, and within the context of the game, this is likely to be taken as an offensive move as it immediately puts pressure on the opponent's _Pawn_ in the 5th position. Right behind at __11%__ is the movement of the __elephant__, which is likely to be viewed as a defensive move (_given that the elephant is not able to cross the river_). We also see the movement of the __Pawn__ and __Horse__, with both coming in at about 9% each of all first moves. 
+
+It doesn't make any practical sense to be moving the rest of the chess pieces for your first move, so I think we can safely ignore these and move on.
+
+```{r firstmove2}
+moves %>%
+  filter(turn == 1 & side == "red") %>%
+  mutate(piece_moved = gsub("^([[:alpha:]]*).*", "\\1", move)) %>%
+  group_by(piece_moved) %>%
+  summarise(count = n()) %>%
+  mutate(pct = round(count / sum(count),2)) %>%
+  arrange(desc(count)) %>%
+  kable(col.names = c("Piece Moved","Number","Percentage"))
+```
+
+### How does the opponent react?
+
+Next, let us take a quick look at how the __black player__ reacts depending on the move that the first player makes. We visualize this with a simple sankey chart using the _googleVis_ package.
+
+There's quite a lot of information in this chart, so let's break it down into a few parts:
+
+1. __Red Player Moves Cannon__ - There are two main reactions to this move, given that the black player's Pawn in position 5 is now under threat. The black player either makes a defensive move by moving his __Horse__ to protect the Pawn, or chooses to make a "_copycat_" offensive move by moving the cannon to a similar position. We also see some instances where the black player moves the elephant, but one wonders the reason behind this move given that this would mean that the Pawn in position 5 would be eaten.
+2. __Red Player moves Elephant, Pawn or Horse__ - We also see that should the red player choose to move an altenrative piece other than the cannon, the __black player__ takes advantage of this by taking this opportunity to put the __red player__ under some pressure by moving the cannon. 
+
+```{r secondmove1,fig.width=13,fig.height=13,results='asis'}
+moves %<>%
+  mutate(piece_moved = gsub("^([[:alpha:]]*).*", "\\1", move)) 
+
+second_move = merge(moves %>% filter(turn == 1 & side == "red"), moves %>% filter(turn == 1 & side == "black"),
+                    by = "gameID", all.x = T)
+
+second_move = second_move %>%
+  mutate(piece_moved.x = ifelse(piece_moved.x == "A", "Queen",
+                         ifelse(piece_moved.x == "K", "King",
+                         ifelse(piece_moved.x == "C", "Cannon",
+                         ifelse(piece_moved.x == "E", "Elephant",
+                         ifelse(piece_moved.x == "H", "Horse",
+                         ifelse(piece_moved.x == "P", "Pawn", "Car")))))),
+         piece_moved.y = ifelse(piece_moved.y == "a", "queen",
+                         ifelse(piece_moved.y == "k", "king",
+                         ifelse(piece_moved.y == "c", "cannon",
+                         ifelse(piece_moved.y == "e", "elephant",
+                         ifelse(piece_moved.y == "h", "horse",
+                         ifelse(piece_moved.y == "p", "pawn", "car"))))))) %>%
+  group_by(piece_moved.x, piece_moved.y) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count))
+
+options(gvis.plot.tag='chart')
+plot(gvisSankey(second_move))
+```
+
+### So... does your first move matter?
+
+Next, based on just the first moves of each player, let's see if its possible to tell if there's a clear winner. 
+
+From the chart below, its not surprising to see that the first moves are not telling of a winner, 
+
+```{r secondmove2}
+second_move = merge(moves %>% filter(turn == 1 & side == "red"), moves %>% filter(turn == 1 & side == "black"),
+                    by = "gameID", all.x = T)
+second_move %<>% merge(game, by = "gameID", all.x = T)
+
+second_move %>%
+  mutate(piece_moved = paste0(piece_moved.x, "-", piece_moved.y)) %>%
+  group_by(piece_moved, winner) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count)) %>%
+  head(18) %>%
+  ggplot(aes(x = reorder(piece_moved, -count), y = count, fill = winner, group = winner)) +
+  geom_bar(stat = "identity", position = "fill") +
+  scale_fill_manual(values = c("black","red")) +
+  theme_light() +
+  theme(text = element_text(size = 16)) +
+  labs(x = "Type of first moves", y = "Proportion of Wins", fill = "Player")
+```
+
+
+
+
+
+
+
+Data source obtained from [Kaggle](https://www.kaggle.com/). Credit to Alin Secareanu for compiling this amazing dataset. Data can be accessed from this [link](https://www.kaggle.com/boyofans/onlinexiangqi/data).
