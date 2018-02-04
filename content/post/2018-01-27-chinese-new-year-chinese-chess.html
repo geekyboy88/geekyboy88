@@ -125,12 +125,12 @@ pre {
 <li><strong>Red Player moves Elephant, Pawn or Horse</strong> - We also see that should the red player choose to move an altenrative piece other than the cannon, the <strong>black player</strong> takes advantage of this by taking this opportunity to put the <strong>red player</strong> under some pressure by moving the cannon.</li>
 </ol>
 <!-- Sankey generated in R 3.4.0 by googleVis 0.6.2 package -->
-<!-- Sun Jan 28 18:53:05 2018 -->
+<!-- Sun Feb  4 23:03:41 2018 -->
 <!-- jsHeader -->
 <script type="text/javascript">
  
 // jsData 
-function gvisDataSankeyID202e3bb5fd14 () {
+function gvisDataSankeyID173f6e5bc96a () {
 var data = new google.visualization.DataTable();
 var datajson =
 [
@@ -318,14 +318,14 @@ return(data);
 }
  
 // jsDrawChart
-function drawChartSankeyID202e3bb5fd14() {
-var data = gvisDataSankeyID202e3bb5fd14();
+function drawChartSankeyID173f6e5bc96a() {
+var data = gvisDataSankeyID173f6e5bc96a();
 var options = {};
 options["width"] = 400;
 options["height"] = 400;
 
     var chart = new google.visualization.Sankey(
-    document.getElementById('SankeyID202e3bb5fd14')
+    document.getElementById('SankeyID173f6e5bc96a')
     );
     chart.draw(data,options);
     
@@ -349,9 +349,9 @@ if (newPackage)
   pkgs.push(chartid);
   
 // Add the drawChart function to the global list of callbacks
-callbacks.push(drawChartSankeyID202e3bb5fd14);
+callbacks.push(drawChartSankeyID173f6e5bc96a);
 })();
-function displayChartSankeyID202e3bb5fd14() {
+function displayChartSankeyID173f6e5bc96a() {
   var pkgs = window.__gvisPackages = window.__gvisPackages || [];
   var callbacks = window.__gvisCallbacks = window.__gvisCallbacks || [];
   window.clearTimeout(window.__gvisLoad);
@@ -374,17 +374,45 @@ callbacks.shift()();
 // jsFooter
 </script>
 <!-- jsChart -->
-<script type="text/javascript" src="https://www.google.com/jsapi?callback=displayChartSankeyID202e3bb5fd14"></script>
+<script type="text/javascript" src="https://www.google.com/jsapi?callback=displayChartSankeyID173f6e5bc96a"></script>
 <!-- divChart -->
-<div id="SankeyID202e3bb5fd14" style="width: 400; height: 400;">
+<div id="SankeyID173f6e5bc96a" style="width: 400; height: 400;">
 
 </div>
 </div>
 <div id="so-does-your-first-move-matter" class="section level3">
 <h3>So… does your first move matter?</h3>
 <p>Next, based on just the first moves of each player, let’s see if its possible to tell if there’s a clear winner.</p>
-<p>From the chart below, its not surprising to see that the first moves are not telling of a winner,</p>
+<p>From the chart below, its not surprising to see that the first moves are not telling of a winner, and the game is really very open even after your first moves. This likely means that no matter what move you make at the start, there should still be a way for you to correct that and win the match.</p>
+<p>Since the first moves of each player is not telling, we then move on to look at early game and see if it does provide some hint of a possible winner.</p>
 <p><img src="/post/2018-01-27-chinese-new-year-chinese-chess_files/figure-html/secondmove2-1.png" width="672" /></p>
-<p>Data source obtained from <a href="https://www.kaggle.com/">Kaggle</a>. Credit to Alin Secareanu for compiling this amazing dataset. Data can be accessed from this <a href="https://www.kaggle.com/boyofans/onlinexiangqi/data">link</a>.</p>
+</div>
+</div>
+<div id="early-game" class="section level2">
+<h2>Early Game</h2>
+<p>To be able to understand the impact of early game on the outcome, let’s focus on games which are well developed. These are games where each player makes at least 20 moves. I also filter out only the first 10 moves, for easy data manipulation.</p>
+<div id="moving-the-chariot-early" class="section level3">
+<h3>Moving the Chariot Early</h3>
+<p>There was a saying in Chinese that <a href="http://www.xqinenglish.com/theanatomyofxiangqipart1.html">“if you don’t move your chariot by move three, you would lose the battle”</a>. We can never be entirely sure if such sayings continue to be true, so what better way than to test it out. (<em>From the chart below, we do find that most players do try to move their chariot by the 3rd move.</em>)</p>
+<p>To do so, I first counted, for each game and player, which was the first move that the player’s chariot was first moved, and next compare if players were more likely to win if they moved their chariot by the third move.</p>
+<p><img src="/post/2018-01-27-chinese-new-year-chinese-chess_files/figure-html/chariot1-1.png" width="672" /></p>
+<p>Next, when we split each of the bars further into winners and losers, we find that the probability of winning doesn’t seem to depend on when you move your chariot. Seems easier to believe now that this old Chinese saying <strong>may no longer be true</strong> anymore.</p>
+<p><img src="/post/2018-01-27-chinese-new-year-chinese-chess_files/figure-html/chariot2-1.png" width="672" /></p>
+</div>
+<div id="moving-the-same-piece-too-often" class="section level3">
+<h3>Moving the same piece too often</h3>
+<p>Another concept in Chinese Chess is <strong>efficiency</strong>, which is to move as many pieces as possible into advantageous positions so that your important troops can “<strong>control important positions</strong>” on the board as early as possible.</p>
+<p>What this implies is that the first 10 moves of the match could be relatively crucial in determining the outcome of the match. For this last section, I will investigate if players who moved a single piece too often have a higher tendency to lose the game.</p>
+<p>From the chart below, we can see that the typically, players tend to move a particular type of piece no more than 3 times during the first 10 moves of the match. Hence, we will focus on the ~13% of players who moved a single type of piece 4 times or more during the first 10 moves of the match.</p>
+<p><img src="/post/2018-01-27-chinese-new-year-chinese-chess_files/figure-html/efficiency1-1.png" width="672" /></p>
+<p>And… here are the results! From the regression coefficient below, we see that there is some importance in moving a variety of pieces in the first 10 moves of the match, as this allows your chess pieces to take up important positions that will lead you in good stead for the rest of the match. However, the saving grace is that the coefficients is not large. An increase in the number of moves on a particular piece in the first 10 moves of the match only reduces the probability of you winning the match by <strong>0.6%</strong>.</p>
+<pre><code>Call:
+probitmfx(formula = is_winner ~ count, data = eff, atmean = T)
+
+Marginal Effects:
+           dF/dx  Std. Err.       z  P&gt;|z|
+count -0.0041348  0.0043565 -0.9491 0.3426</code></pre>
+<p>Hope this inspires you to have a quick game of Chinese Chess during the upcoming Chinese New Year Holidays!</p>
+<p>Data source obtained from <a href="https://www.kaggle.com/">Kaggle</a>. Credit to Chang Hsin Lee for compiling this amazing dataset. Data can be accessed from this <a href="https://www.kaggle.com/boyofans/onlinexiangqi/data">link</a>.</p>
 </div>
 </div>

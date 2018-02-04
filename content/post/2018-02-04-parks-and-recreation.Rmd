@@ -1,0 +1,53 @@
+---
+title: Parks and Recreation
+author: geekyboy88
+date: '2018-02-04'
+slug: parks-and-recreation
+categories:
+  - Text
+  - Text Analytics
+  - R
+tags:
+  - analytics
+  - TextAnalytics
+  - R
+---
+
+<style type="text/css">
+
+body, td {
+   font-size: 18px;
+}
+code.r{
+  font-size: 18px;
+}
+pre {
+  font-size: 18px
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning=FALSE, echo=FALSE, comment=NA, message=FALSE)
+```
+
+## Parks and Recreation
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

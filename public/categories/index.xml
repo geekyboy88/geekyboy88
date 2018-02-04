@@ -51,7 +51,7 @@
     <item>
       <title>R</title>
       <link>/categories/r/</link>
-      <pubDate>Sat, 27 Jan 2018 00:00:00 +0000</pubDate>
+      <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
       <author>kennethang7@gmail.com (Kenneth)</author>
       <guid>/categories/r/</guid>
       <description></description>
@@ -69,9 +69,18 @@
     <item>
       <title>Text</title>
       <link>/categories/text/</link>
-      <pubDate>Thu, 21 Dec 2017 00:00:00 +0000</pubDate>
+      <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
       <author>kennethang7@gmail.com (Kenneth)</author>
       <guid>/categories/text/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Text Analytics</title>
+      <link>/categories/text-analytics/</link>
+      <pubDate>Sun, 04 Feb 2018 00:00:00 +0000</pubDate>
+      <author>kennethang7@gmail.com (Kenneth)</author>
+      <guid>/categories/text-analytics/</guid>
       <description></description>
     </item>
     

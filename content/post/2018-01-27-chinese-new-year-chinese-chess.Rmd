@@ -42,6 +42,7 @@ The dataset is split into two parts. The first dataset contains game-level infor
 library(magrittr)
 library(RColorBrewer)
 library(ggplot2)
+library(mfx)
 library(googleVis)
 library(knitr)
 library(scales)
@@ -206,7 +207,9 @@ plot(gvisSankey(second_move))
 
 Next, based on just the first moves of each player, let's see if its possible to tell if there's a clear winner. 
 
-From the chart below, its not surprising to see that the first moves are not telling of a winner, 
+From the chart below, its not surprising to see that the first moves are not telling of a winner, and the game is really very open even after your first moves. This likely means that no matter what move you make at the start, there should still be a way for you to correct that and win the match.
+
+Since the first moves of each player is not telling, we then move on to look at early game and see if it does provide some hint of a possible winner.
 
 ```{r secondmove2}
 second_move = merge(moves %>% filter(turn == 1 & side == "red"), moves %>% filter(turn == 1 & side == "black"),
@@ -227,10 +230,112 @@ second_move %>%
   labs(x = "Type of first moves", y = "Proportion of Wins", fill = "Player")
 ```
 
+## Early Game
+
+To be able to understand the impact of early game on the outcome, let's focus on games which are well developed. These are games where each player makes at least 20 moves. I also filter out only the first 10 moves, for easy data manipulation.
+
+```{r openinggame}
+opening = moves %>%
+  group_by(gameID, side) %>%
+  mutate(max_turn = max(turn)) %>%
+  filter(turn <= 10 & max_turn > 20)
+```
+
+### Moving the Chariot Early
+
+There was a saying in Chinese that ["if you don't move your chariot by move three, you would lose the battle"](http://www.xqinenglish.com/theanatomyofxiangqipart1.html). We can never be entirely sure if such sayings continue to be true, so what better way than to test it out. (_From the chart below, we do find that most players do try to move their chariot by the 3rd move._)
+
+To do so, I first counted, for each game and player, which was the first move that the player's chariot was first moved, and next compare if players were more likely to win if they moved their chariot by the third move.
+
+```{r chariot1}
+chariot = opening %>%
+  mutate(piece_moved = gsub("^([[:alpha:]]*).*", "\\1", move),
+         chariot = ifelse(piece_moved %in% c("R","r"), turn, 99)) %>%
+  group_by(gameID, side) %>%
+  summarise(first_chariot = min(chariot))
+
+chariot %<>% merge(game, by = "gameID", all.x = T)
+
+chariot %>%
+  filter(first_chariot != 99) %>%
+  mutate(win = ifelse(side == winner, 1, 0)) %>%
+  group_by(first_chariot, win) %>%
+  summarise(count = n()) %>%
+  ggplot(aes(x = first_chariot, y = count, fill = first_chariot)) +
+  geom_bar(stat = "identity") +
+  theme_light() +
+  scale_fill_gradientn(colours = terrain.colors(7)) +
+  theme(legend.position = "none", text = element_text(size = 16)) +
+  labs(x = "First Chariot Move", y = "Number of Occurances\n") +
+  scale_x_continuous(breaks = seq(1,10,1))
+```
+
+Next, when we split each of the bars further into winners and losers, we find that the probability of winning doesn't seem to depend on when you move your chariot. Seems easier to believe now that this old Chinese saying __may no longer be true__ anymore.
+
+```{r chariot2}
+chariot %>%
+  filter(first_chariot != 99) %>%
+  mutate(win = ifelse(side == winner, 1, 0)) %>%
+  group_by(first_chariot, win) %>%
+  summarise(count = n()) %>%
+  ggplot(aes(x = first_chariot, y = count, fill = win)) +
+  geom_bar(stat = "identity", position = position_fill()) +
+  theme_light() +
+  scale_fill_continuous(high = "green",low = "blue") +
+  theme(legend.position = "none", text = element_text(size = 16)) +
+  labs(x = "First Chariot Move", y = "Proportion of Occurances\n") +
+  scale_x_continuous(breaks = seq(1,10,1))
+rm(chariot)
+```
+
+### Moving the same piece too often
+
+Another concept in Chinese Chess is __efficiency__, which is to move as many pieces as possible into advantageous positions so that your important troops can "__control important positions__" on the board as early as possible.
+
+What this implies is that the first 10 moves of the match could be relatively crucial in determining the outcome of the match. For this last section, I will investigate if players who moved a single piece too often have a higher tendency to lose the game. 
+
+From the chart below, we can see that the typically, players tend to move a particular type of piece no more than 3 times during the first 10 moves of the match. Hence, we will focus on the ~13% of players who moved a single type of piece 4 times or more during the first 10 moves of the match.
+
+```{r efficiency1}
+eff = opening %>%
+  mutate(piece_moved = gsub("^([[:alpha:]]*).*", "\\1", move)) 
+
+eff %<>%
+  group_by(gameID, side, piece_moved) %>%
+  summarise(count = n()) %>%
+  mutate(piece_moved = toupper(piece_moved)) 
+
+eff %>%
+  group_by(factor(count)) %>%
+  summarise(occurances = n()) %>%
+  mutate(pct = round(occurances / sum(occurances),2)) %>%
+  ggplot(aes(x = `factor(count)`, y = occurances, fill = "green2")) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(x = `factor(count)`, label = paste0(100*pct,"%"))) +
+  theme_classic() +
+  labs(x = "Number of moves using a particular piece","Count by number of moves") +
+  theme(legend.position = "none", text = element_text(size = 16))
+```
+
+And... here are the results! From the regression coefficient below, we see that there is some importance in moving a variety of pieces in the first 10 moves of the match, as this allows your chess pieces to take up important positions that will lead you in good stead for the rest of the match. However, the saving grace is that the coefficients is not large. An increase in the number of moves on a particular piece in the first 10 moves of the match only reduces the probability of you winning the match by __0.6%__. 
+
+```{r efficiency2}
+eff %<>%
+  group_by(gameID, side) %>%
+  mutate(max_count = max(count)) %>%
+  filter(count == max_count) %>%
+  distinct(gameID, side, .keep_all = T)
+
+eff %<>% merge(game %>%
+              select(gameID, winner), by = "gameID", all.x = T)
+
+eff$is_winner = ifelse(eff$winner == eff$side, 1, 0)
+
+mod = probitmfx(is_winner ~ count, data = eff, atmean = T)
+mod
+```
+
+Hope this inspires you to have a quick game of Chinese Chess during the upcoming Chinese New Year Holidays!
 
 
-
-
-
-
-Data source obtained from [Kaggle](https://www.kaggle.com/). Credit to Alin Secareanu for compiling this amazing dataset. Data can be accessed from this [link](https://www.kaggle.com/boyofans/onlinexiangqi/data).
+Data source obtained from [Kaggle](https://www.kaggle.com/). Credit to Chang Hsin Lee for compiling this amazing dataset. Data can be accessed from this [link](https://www.kaggle.com/boyofans/onlinexiangqi/data).
