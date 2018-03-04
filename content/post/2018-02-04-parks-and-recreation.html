@@ -29,4 +29,389 @@ pre {
 </style>
 <div id="parks-and-recreation" class="section level2">
 <h2>Parks and Recreation</h2>
+<p>Last year, I was introduced to the show Parks and Recreation, which is a <a href="https://en.wikipedia.org/wiki/Mockumentary"><strong>Mockumentary</strong></a> that revolved around the everyday office life of the Parks Department of Pawnee, Indiana. The main star of the show is Leslie Knope, who is a deputy director in that department. Being set in a government agency, we see how bureaucracy slows down her efforts to develop the town of Pawnee into a beautiful town.</p>
+<pre class="r"><code>rm(list=ls())
+packages = c(&quot;magrittr&quot;,&quot;rvest&quot;,&quot;plyr&quot;,&quot;dplyr&quot;,&quot;stringr&quot;,&quot;stringi&quot;,&quot;tidyr&quot;,&quot;lattice&quot;,&quot;tm&quot;,&quot;quanteda&quot;,&quot;SnowballC&quot;,&quot;Matrix&quot;,&quot;reshape2&quot;,&quot;tidytext&quot;,&quot;tidyverse&quot;,&quot;ggplot2&quot;,&quot;scales&quot;,&quot;knitr&quot;,&quot;igraph&quot;,&quot;ggraph&quot;)
+lapply(packages, require, character.only = TRUE)
+rm(packages)</code></pre>
+<div id="web-scraping" class="section level3">
+<h3>Web-scraping</h3>
+<p>To obtain the script and convert into text data, I used the springfield’s links and the <strong>rvest</strong> package in R to first pull out all the links to the scripts of the show, and subsequently ran a loop to scrape the episodes scripts before writing them into a <strong>.txt</strong> file</p>
+<p>First, let’s load the script as text data, remove all punctuation, whitespaces, and lastly to convert all the letters to lowercase for easy data wrangling.</p>
+<pre class="r"><code>files = VCorpus(DirSource(&quot;../../static/data/text&quot;, recursive = T), readerControl = list(language = &quot;en&quot;))</code></pre>
+</div>
+</div>
+<div id="tidying-the-data" class="section level2">
+<h2>Tidying the Data</h2>
+<p>For easy text data manipulation, I’ve used the packages described in <a href="https://www.tidytextmining.com/">Text Mining in R</a> by Julia Silge and David Robinson. In the codes below, I converted the Corpus of text files that I have consolidated under “<em>files</em>”&quot; into a dataframe “<em>parks</em>”. This is a pretty neat solution, given that it allows me to have a look at the metadata, and also run data manipulations quite easily. Let’s see where this takes us.</p>
+</div>
+<div id="most-common-words" class="section level2">
+<h2>Most Common Words</h2>
+<p>The first thing that we could do is to identify what are the most common words that are found in the script. However, as you can tell from the tibble below, the most common words are those that are also most commonly used in the english language, such as <strong>I</strong>, <strong>you</strong>, <strong>the</strong>. However, this does not give us any indication of what this TV show, “<strong>Parks and Recreation</strong>” is about.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Word</th>
+<th align="right">Word Count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">i</td>
+<td align="right">14632</td>
+</tr>
+<tr class="even">
+<td align="left">you</td>
+<td align="right">13756</td>
+</tr>
+<tr class="odd">
+<td align="left">the</td>
+<td align="right">11179</td>
+</tr>
+<tr class="even">
+<td align="left">to</td>
+<td align="right">10051</td>
+</tr>
+<tr class="odd">
+<td align="left">a</td>
+<td align="right">9850</td>
+</tr>
+<tr class="even">
+<td align="left">and</td>
+<td align="right">8229</td>
+</tr>
+<tr class="odd">
+<td align="left">is</td>
+<td align="right">5481</td>
+</tr>
+<tr class="even">
+<td align="left">that</td>
+<td align="right">5353</td>
+</tr>
+<tr class="odd">
+<td align="left">of</td>
+<td align="right">5233</td>
+</tr>
+<tr class="even">
+<td align="left">it</td>
+<td align="right">5229</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="most-common-words-1" class="section level2">
+<h2>Most Common Words</h2>
+<p>A common pre-processing step that many working on text analytics would do is to first remove the stop words. These are words that are commonly found in the english language (<em>what I mentioned previously</em>).</p>
+<p>After removing these words, we can immediately have some clue of what the show is about. We see words that are:</p>
+<ol style="list-style-type: decimal">
+<li>commonly used in speech (<strong>yeah</strong>, <strong>gonna</strong> and <strong>hey</strong>),</li>
+<li>show names (<strong>leslie</strong>, <strong>ron</strong>, <strong>ann</strong>), and</li>
+<li>related to the theme of the show (<strong>god</strong>, <strong>love</strong>, <strong>people</strong>, <strong>pawnee</strong>).</li>
+</ol>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Word</th>
+<th align="right">Word Count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">yeah</td>
+<td align="right">1717</td>
+</tr>
+<tr class="even">
+<td align="left">gonna</td>
+<td align="right">1381</td>
+</tr>
+<tr class="odd">
+<td align="left">leslie</td>
+<td align="right">1320</td>
+</tr>
+<tr class="even">
+<td align="left">hey</td>
+<td align="right">1251</td>
+</tr>
+<tr class="odd">
+<td align="left">ron</td>
+<td align="right">885</td>
+</tr>
+<tr class="even">
+<td align="left">time</td>
+<td align="right">884</td>
+</tr>
+<tr class="odd">
+<td align="left">god</td>
+<td align="right">733</td>
+</tr>
+<tr class="even">
+<td align="left">love</td>
+<td align="right">722</td>
+</tr>
+<tr class="odd">
+<td align="left">people</td>
+<td align="right">695</td>
+</tr>
+<tr class="even">
+<td align="left">pawnee</td>
+<td align="right">683</td>
+</tr>
+<tr class="odd">
+<td align="left">ann</td>
+<td align="right">628</td>
+</tr>
+<tr class="even">
+<td align="left">guys</td>
+<td align="right">611</td>
+</tr>
+<tr class="odd">
+<td align="left">tom</td>
+<td align="right">542</td>
+</tr>
+<tr class="even">
+<td align="left">andy</td>
+<td align="right">500</td>
+</tr>
+<tr class="odd">
+<td align="left">ben</td>
+<td align="right">499</td>
+</tr>
+<tr class="even">
+<td align="left">knope</td>
+<td align="right">474</td>
+</tr>
+<tr class="odd">
+<td align="left">day</td>
+<td align="right">461</td>
+</tr>
+<tr class="even">
+<td align="left">talk</td>
+<td align="right">457</td>
+</tr>
+<tr class="odd">
+<td align="left">uh</td>
+<td align="right">456</td>
+</tr>
+<tr class="even">
+<td align="left">april</td>
+<td align="right">452</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="name-mentions" class="section level2">
+<h2>Name Mentions</h2>
+<p>The next thing on our minds would be to find out who are the main characters of this show. As mentioned previously, Leslie Knope is the main star of the show, and she is closely followed behind by her boss, Ron Swanson. The rest of the crew seem to have more or less the same level of show time with the rest.</p>
+<pre><code># A tibble: 9 x 2
+  variable count
+  &lt;fct&gt;    &lt;dbl&gt;
+1 leslie    1794
+2 ron       1069
+3 ann        738
+4 tom        645
+5 ben        616
+6 andy       562
+7 jerry      510
+8 april      506
+9 chris      301</code></pre>
+<p>However, is there a difference between each character’s appearances between the various seasons? Let’s take a closer look.</p>
+<p>From the chart below, we can derive a few insights:</p>
+<ol style="list-style-type: decimal">
+<li>Leslie Knope is definitely the main character of the show as she has the most number of name mentions through almost all seasons, save for the last one where she was overtaken slightly by her boss, Ron.</li>
+<li>Ben Wyatt and Chris Traeger only appear towards the end of the second season. <strong>Why did they only appear then though?</strong></li>
+<li>Jerry had a slightly stand-out <strong>season 5</strong>.</li>
+<li>April Ludgate was also more involved in the <strong>final season</strong>.</li>
+</ol>
+<p><img src="/post/2018-02-04-parks-and-recreation_files/figure-html/commonwords4-1.png" width="1248" /></p>
+</div>
+<div id="understanding-the-characters" class="section level2">
+<h2>Understanding the Characters</h2>
+<p>The next thing that we would like to do is to understand a bit about the characters better. To do so, we will use a technique that tokenizes these words into <strong>“n-grams”</strong>. What I’ve done below is the simplest case of tokenizing by 2 words, and finding out how often a word appears with another word, and in doing so we hope to see if we can understand these characters better!</p>
+<pre><code># A tibble: 20 x 3
+   word1   word2          n
+   &lt;chr&gt;   &lt;chr&gt;      &lt;int&gt;
+ 1 leslie  knope        267
+ 2 yeah    yeah         108
+ 3 ron     swanson      107
+ 4 parks   department   106
+ 5 ann     perkins       93
+ 6 hey     hey           88
+ 7 city    council       81
+ 8 ben     wyatt         79
+ 9 tom     haverford     61
+10 bobby   newport       51
+11 city    hall          50
+12 wait    wait          49
+13 ha      ha            46
+14 whoa    whoa          43
+15 city    manager       41
+16 ms      knope         41
+17 harvest festival      40
+18 hey     leslie        40
+19 mmm     hmm           40
+20 hey     ron           38</code></pre>
+<p>To start off, let’s take a look at the words that tend to be associated with the main star of our show, <strong>Leslie Knope</strong>.</p>
+<p>From the table below, we can make some inferences.</p>
+<ol style="list-style-type: decimal">
+<li>She’s a woman (<em>duh</em>) as she’s addressed as a <em>ms</em>.</li>
+<li><strong>Councilwoman</strong>. This could suggest that somewhere in one of the seasons, Leslie Knope decided to run for <strong>city council</strong>.</li>
+<li><strong>Griggs-Knope</strong>. None other than her mother.</li>
+<li><strong>Ron</strong>. Her boss, who holds the position of <strong>Director</strong> of the parks department.</li>
+</ol>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Words Associated with Leslie Knope</th>
+<th align="right">Count of Word</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">hey</td>
+<td align="right">67</td>
+</tr>
+<tr class="even">
+<td align="left">ms</td>
+<td align="right">41</td>
+</tr>
+<tr class="odd">
+<td align="left">miss</td>
+<td align="right">33</td>
+</tr>
+<tr class="even">
+<td align="left">councilwoman</td>
+<td align="right">24</td>
+</tr>
+<tr class="odd">
+<td align="left">recall</td>
+<td align="right">20</td>
+</tr>
+<tr class="even">
+<td align="left">yeah</td>
+<td align="right">19</td>
+</tr>
+<tr class="odd">
+<td align="left">griggs</td>
+<td align="right">13</td>
+</tr>
+<tr class="even">
+<td align="left">knope’s</td>
+<td align="right">10</td>
+</tr>
+<tr class="odd">
+<td align="left">ann</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">god</td>
+<td align="right">9</td>
+</tr>
+<tr class="odd">
+<td align="left">bye</td>
+<td align="right">8</td>
+</tr>
+<tr class="even">
+<td align="left">morning</td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">ron</td>
+<td align="right">8</td>
+</tr>
+<tr class="even">
+<td align="left">boo</td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="left">uh</td>
+<td align="right">6</td>
+</tr>
+</tbody>
+</table>
+<p>We can do the same for <strong>Ron Swanson</strong>.</p>
+<p>The words associated with Ron are slightly more interesting, in the sense that his name tends to be associated with the names of the other characters, which could suggest that he interacts with all his subordinates equally (<em>good boss or just him being the boss?</em>). Something else interesting also pops up, as we see Ron’s ex-wife, <strong>Tammy</strong>, appear a decent number of times through the season.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Words Associated with Ron Swanson</th>
+<th align="right">Count of Word</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">hey</td>
+<td align="right">45</td>
+</tr>
+<tr class="even">
+<td align="left">god</td>
+<td align="right">11</td>
+</tr>
+<tr class="odd">
+<td align="left">tammy</td>
+<td align="right">10</td>
+</tr>
+<tr class="even">
+<td align="left">yeah</td>
+<td align="right">10</td>
+</tr>
+<tr class="odd">
+<td align="left">leslie</td>
+<td align="right">8</td>
+</tr>
+<tr class="even">
+<td align="left">loves</td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">congratulations</td>
+<td align="right">6</td>
+</tr>
+<tr class="even">
+<td align="left">shot</td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="left">tom</td>
+<td align="right">6</td>
+</tr>
+<tr class="even">
+<td align="left">april</td>
+<td align="right">5</td>
+</tr>
+<tr class="odd">
+<td align="left">chris</td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">swanson’s</td>
+<td align="right">5</td>
+</tr>
+<tr class="odd">
+<td align="left">andy</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="left">carpenter</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">chairs</td>
+<td align="right">4</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="theme-of-each-season" class="section level2">
+<h2>Theme of each season</h2>
+<p>Let’s turn our attention to something else that <strong>n-grams</strong> can help us learn more about the content in the episodes.</p>
+<p>What we will do next, is to find out what are the most common bi-grams in each of the 7 seasons of Parks and Recreation, and put them into a simple bar plot using the <strong>tf-idf</strong>, short for term frequency - inverse document frequency. What this allows us to do is to find out what are the top 10 most important words in each of the seasons.</p>
+<p>Let’s take a look. In the first season, <strong>Janine Retrespo</strong> seems to play a major role. She is a member of the <strong>zoning board</strong> (<em>2nd most important word, see where this is going?</em>), and Leslie Knope was trying to get her approval to fill in the pit at <strong>Sullivan Street</strong>.</p>
+<p><img src="/post/2018-02-04-parks-and-recreation_files/figure-html/theme1-1.png" width="1248" /></p>
+<p>Another way of representing could be to use a network graph, using the <strong>ggraph</strong> package. Let’s take a look at what we have.</p>
+<p>As we can see below, many of the word relations are still within each of their own <em>mini</em> networks, and it is only in the node <strong>“hey”</strong> where we see a number of words that are inter-related. But this is of course a figure of speech, which is essentially what our data is, a script. So it would be difficult to find anything coherent in this case, as compared to if we were to use text data from a story book, where the sentences are well structured.</p>
+<p><img src="/post/2018-02-04-parks-and-recreation_files/figure-html/theme2-1.png" width="1152" /></p>
+<p>I hope this gives you an insight to what the show <strong>Parks and Recreation</strong> is about. I really enjoyed the show, and I hope that looking at the key words (and without me explaining most of the stuff), you might be curious to find out what words like <strong>“Entertainment 720”</strong> and <strong>“Johnny Karate”</strong> mean in the show. I’ll stop here for now, but I’ll be back with further analyses on parks and recreation.</p>
+</div>
+<div id="stay-tuned" class="section level2">
+<h2>Stay Tuned!!</h2>
 </div>
