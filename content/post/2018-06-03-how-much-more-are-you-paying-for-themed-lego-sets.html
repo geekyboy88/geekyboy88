@@ -1,0 +1,384 @@
+---
+title: How much more are you paying for themed lego sets?
+author: geekyboy88
+date: '2018-06-03'
+slug: how-much-more-are-you-paying-for-themed-lego-sets
+categories:
+  - lego
+  - Analytics
+tags:
+  - lego
+  - analytics
+---
+
+
+
+<style type="text/css">
+
+body, td {
+   font-size: 18px;
+}
+code.r{
+  font-size: 18px;
+}
+pre {
+  font-size: 18px
+}
+</style>
+<div id="lego" class="section level2">
+<h2>Lego</h2>
+<p>For my next post, I will be looking through data on something relatively closer to my heart, <strong>LEGO</strong>! But I must admit first and foremost that I was not always an avid Lego collector. I was very fortunate to have been able to play with these toys during my childhood (<em>as it isn’t exactly the cheapest of toys and I have to thank my parents for that</em>). I soon outgrew them as I moved on to JC and NS. However, when I was studying in the University, I stumbled upon one of the latest sets by random chance: a pretty awesome <strong>Hogwarts Castle</strong> set. I was intrigued and from then on, I really started to expand my collection.</p>
+</div>
+<div id="kernel-on-lego-set-price-prediction" class="section level2">
+<h2>Kernel on lego set price prediction</h2>
+<p>Recently, I stumbled upon a kernel done by <a href="https://www.kaggle.com/jonathanbouchet/are-lego-sets-too-pricey?utm_medium=email&amp;utm_source=mailchimp&amp;utm_campaign=data-notes-may-31">Johnathan Bouchet</a>, where he attempted to predict the price of a lego set based on some pre-defined variables.</p>
+</div>
+<div id="motivation" class="section level2">
+<h2>Motivation</h2>
+<p>His kernel got me to think: <strong>what is the premium that we pay for sets of a particular theme?</strong> To provide some context, maybe we can take a quick look at the data.</p>
+<pre class="r"><code>rm(list=ls())
+packages = c(&quot;magrittr&quot;,&quot;rvest&quot;,&quot;plyr&quot;,&quot;dplyr&quot;,&quot;stringr&quot;,&quot;stringi&quot;,&quot;tidyr&quot;,&quot;ggplot2&quot;,&quot;scales&quot;,&quot;knitr&quot;,&quot;margins&quot;)
+lapply(packages, require, character.only = TRUE)
+rm(packages)</code></pre>
+<p>This is what the data looks like. There are 14 variables in this dataset, but not all of which we going to use.</p>
+<pre><code>  ages list_price num_reviews piece_count play_star_rating
+1 6-12      29.99           2         277              4.0
+2 6-12      19.99           2         168              4.0
+3 6-12      12.99          11          74              4.3
+4  12+      99.99          23        1032              3.6
+5  12+      79.99          14         744              3.2
+6  12+      59.99           7         597              3.7
+                                                            prod_desc
+1   Catapult into action and take back the eggs from the Piggy Trike!
+2    Launch a flying attack and rescue the eggs from the Piggy Plane!
+3      Chase the piggy with lightning-fast Chuck and rescue the eggs!
+4     Explore the architecture of the United States Capitol Building!
+5 Recreate the Solomon R. Guggenheim Museum® with LEGO® Architecture!
+6        Celebrate Shanghai with this LEGO® Architecture Skyline set!
+  prod_id
+1   75823
+2   75822
+3   75821
+4   21030
+5   21035
+6   21039
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         prod_long_desc
+1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               Use the staircase catapult to launch Red into the air and race after the piggy, who is speeding off in the Piggy Trike with the eggs. Help him take the eggs out of the trike&#39;s box in this hilarious set, which also features Matilda&#39;s House to help Red relax, and a spinning Billy the Sign, based on The Angry BirdsTM Movie. Includes 3 figures.\nIncludes 3 figures: Red, Matilda and Biker Pig.\nBird Island Egg Heist features Matilda&#39;s House with a staircase catapult and easel, plus a branch, plants, flower elements and a Piggy Trike.\nPiggy Trike features a giant front wheel, 2 balloons and a box at the rear for eggs.\nAccessory elements include spinning Billy the Sign, 4 eggs and 2 bird nests.\nUse Red to get into a fight with Billy the Sign to make it spin!\nPlace Red inside Matilda&#39;s House next to the easel and help him paintto relieve his anger!\nPlace the eggs in the Piggy Trike&#39;s box and watch the piggy zoom off.\nPosition Red on the staircase catapult and launch him at the Piggy Trike!\nCreate fun action scenes with a twist from The Angry BirdsTM movie.\nThis set offers an age-appropriate building experience for children ages 6-12.\nMatilda&#39;s House measures over 5” (15cm) high, 6” (17cm) wide and 3” (9cm) deep.\nBilly the Sign stands over 2” (7cm) high.\nPiggy Trike measures over 3” (8cm) high,5” (15c m) long and 2” (6cm) wide.
+2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    Pilot Pig has taken off from Bird Island with 4 eggs in his plane and is making his escape. Shoot Red into the sky using the catapult and on to the Piggy Plane. Battle with the piggy and take control of the plane, and land it safely without damaging the eggs! Includes 2 figures.\nIncludes 2 figures: Red and Pilot Pig.\nPiggy Plane features a spinning propeller, landing wheels, cockpit, joystick and 2 flick missiles.\nAccessory elements include a catapult, 4 eggs and 2 balloons.\nUse the catapult to launch Red at the Piggy Plane and bring it down to the ground to save the eggs!\nCreate fun scenes with an action twist from The Angry BirdsTM Movie.\nThis set offers an age-appropriate building experience for children ages 6-12.\nPiggy Plane measures over 3” (9cm) high, 4” (12cm) long and 5” (13cm) wide.\nCatapult measures over 1” (5cm) high, 3” (9cm) long and 2” (6cm) wide.
+3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               Pitch speedy bird Chuck against the Piggy Car. Chase the car to try and take back the eggs, but watch out for its ice cream shooter in this fun set, based on The Angry BirdsTM Movie. Includes 2 figures.\nIncludes 2 figures: Chuck the Angry Bird and a piggy.\nPiggy Car features 2 exhaust pipes (one with a flame), a nest, 2 eggs, flag and an ice cream shooter.\nSend speedy Chuck racing after the Piggy Car to remove the eggs from the nest and bring them back to the flock.\nCreate fun action scenes with a twist from The Angry BirdsTM Movie.\nThis set offers an age-appropriate building experience for children ages 6-12.\nPiggy Car measures over 2” (6cm) high, 6” (16cm) long and 2” (6cm)wide.
+4                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 Discover the architectural secrets of the iconic United States Capitol Building with this amazing LEGO® Architecture interpretation that focuses on the structure&#39;s neoclassical style facade, steps and lawns, finished with a decorative “U.S. Capitol” nameplate. Remove the dome to access the rotunda interior depicting the National Statuary Hall, with columns, 8 statues and tiled floor. This model has been designed to deliver an interesting and rewarding building experience and is suitable for display in the home and office. It has been developed for all with an interest in travel, architectural culture, history and design. The scale of this model matches the LEGO Architecture 21022 Lincoln Memorial.\nBuild a detailed model of the United States Capitol Building!\nIncludes collectible booklet containing information about the design, architecture and history of the building\nLEGO Architecture building toys are compatible with all LEGO construction sets for creative building\nUnited States Capitol Building measures 6 inches high, 17 inches wide, and 6 inches deep\n1,032 pieces – For boys and girls over the age of 12 years old\nThis model of the United States Capitol Building matches the scale of the LEGO Architecture Lincoln Memorial 21022
+5                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             Discover the architectural secrets of Frank Lloyd Wright’s Solomon R. Guggenheim Museum®. This accurately detailed LEGO® model faithfully recreates the curves and distinctive lines that have made this building an architectural icon for the last half-century. The simple, grid-patterned facade of the annex tower complements the main building with its circular rotundas, while buildable exterior elements depict a section of New York City’s 5th Avenue Museum Mile, complete with its signature yellow cabs. The Guggenheim sign, featuring Wright’s architectural lettering, has also been recreated in a similar typeface to heighten the authenticity of the model. This LEGO Architecture model has been designed to deliver a rewarding building experience for all with an interest in architecture, travel, history and design, and is suitable for display in the home and office.\nBuild a detailed model of New York City’s architectural icon!\nIncludes Frank Lloyd Wright’s famous rotunda, the 8-story annex tower and 5th Avenue Museum Mile with scaled yellow cabs\nIncludes collectible booklet containing information about the design, architecture and history of the building\nLEGO Architecture building toys are compatible with all LEGO construction sets for creative building\nThe museum is over 4” high, 7” wide and 5” deep\n744 pieces – For boys and girls over 12 years old
+6 Recreate Shanghai in China&#39;s blend of historical and modern architecture with this realistic 21039 LEGO® Architecture Skyline Collection model. This LEGO brick collectible toy features the city&#39;s iconic points of interest, including Chenghuang Miao Temple, Longhua Temple and Pagoda, Radisson Blu Hotel, Bund area, Oriental Pearl, World Financial Center, the Shanghai Tower and Huangpu River, and is finished with a decorative Shanghai nameplate. The LEGO Architecture Skyline Collection offers models suitable for display in the home and office, and has been developed for all with an interest in travel, architectural culture, history and design. Each set is scaled to give an accurate representation of the comparative size of each structure, with realistic color depiction.\nLEGO® Architecture interpretation of Shanghai, China.\nFeatures iconic attractions Chenghuang Miao Temple, Longhua Temple and Pagoda, Radisson Blu Hotel, Bund area, Oriental Pearl, World Financial Center and the Shanghai Tower.\nThe Huangpu River is represented in the tiled baseplate.\nThe included booklet contains information about the designer, architecture and history of each structure, as well as historical facts about Shanghai and its architectural heritage (English language only. Other languages available for download at LEGO.com/architecture. Ask your parents before going online).\nIncludes a 4x32 tiled base with decorative Shanghai nameplate.\nRecreate the world&#39;s most dynamic cities with the LEGO® Architecture Skyline Collection.\nLEGO® Architecture celebrates the world of architecture through the medium of the LEGO brick, and is developed for all with an interest in travel, design, architecture and history.\nThis collectible souvenir toy includes over 595 pieces and is suitable for ages 12+.\nMeasures over 9” (25cm) high, 11” (28cm) wide and 2” (7cm) deep.
+  review_difficulty                       set_name star_rating
+1           Average          Bird Island Egg Heist         4.5
+2              Easy             Piggy Plane Attack         5.0
+3              Easy               Piggy Car Escape         4.3
+4           Average United States Capitol Building         4.6
+5       Challenging  Solomon R. Guggenheim Museum®         4.6
+6           Average                       Shanghai         4.9
+    theme_name val_star_rating country
+1 Angry Birds™             4.0      US
+2 Angry Birds™             4.0      US
+3 Angry Birds™             4.1      US
+4 Architecture             4.3      US
+5 Architecture             4.1      US
+6 Architecture             4.4      US</code></pre>
+<p>To start off, let’s take a quick look at the number of themes in this dataset. As you can tell from the chart below summarising the number of sets per theme, there are quite a number of themes. Some of the themes are relatively newer or may just have lesser sets in general, so we may want to omit those as we may not be able to draw any conclusions from themes where the sample size is small. To do this, I dropped themes that have less than 250 sets. The 250 minimum number of sets cut-off is determined <em>partly arbitarily and partly by eyeballing</em> the chart below. I would also drop the <strong>DIMENSIONS</strong> and <strong>MINDSTORM</strong> sets since these sets are not your typical lego sets, and the <strong>DUPLO</strong> sets given that the size of the pieces are not really comparable (<em>this will be explained in a later section</em>).</p>
+<p><img src="/post/2018-06-03-how-much-more-are-you-paying-for-themed-lego-sets_files/figure-html/categories1-1.png" width="1152" /></p>
+<p>So that leaves us with 21 remaining themes.</p>
+</div>
+<div id="price-differences" class="section level2">
+<h2>Price Differences</h2>
+<p>Next, we can see broadly if there are some price differences between themes.</p>
+<p><img src="/post/2018-06-03-how-much-more-are-you-paying-for-themed-lego-sets_files/figure-html/prices1-1.png" width="960" /></p>
+<p>As we see, the average prices of <strong>Classic</strong> sets is right at the bottom of the table at <strong>$20.68</strong>, suggesting that there could be a premium that we pay for the other <strong>“THEMED”</strong> sets. However, it is also quite telling to note that the <strong>Classic</strong> sets are not quite the bottom, and <strong>BrickHeadz</strong> sets costs lesser instead. For those of you who are not familiar with the <strong>BrickHeadz</strong> sets, these are generally smaller sets with a lower piece counts than the average set. What this implies is that we should also take into consideration other factors that might affect the differences in prices of sets between lego themes.</p>
+<p>Let’s do some further investigation on this.</p>
+</div>
+<div id="piece-count" class="section level2">
+<h2>Piece Count</h2>
+<p><img src="/post/2018-06-03-how-much-more-are-you-paying-for-themed-lego-sets_files/figure-html/piececount1-1.png" width="864" /></p>
+<p>And with that, we can now move on to the regression. Just to again refresh the variables that we have available.</p>
+<pre><code>Classes &#39;grouped_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 8891 obs. of  15 variables:
+ $ ages             : chr  &quot;10+&quot; &quot;10+&quot; &quot;10+&quot; &quot;10+&quot; ...
+ $ list_price       : num  29.99 19.99 19.99 9.99 9.99 ...
+ $ num_reviews      : num  13 1 1 1 1 3 2 1 1 2 ...
+ $ piece_count      : num  708 234 160 149 141 101 105 113 136 91 ...
+ $ play_star_rating : num  4.7 3 5 2 2 4 3 5 NA 3 ...
+ $ prod_desc        : chr  &quot;Build a LEGO® BrickHeadz version of yourself!&quot; &quot;Train a raptor with LEGO® BrickHeadz™ Owen and Blue!&quot; &quot;Join Mr. Incredible and Frozone for LEGO® BrickHeadz™ crime-fighting fun!&quot; &quot;Growl like a Wookiee with a LEGO® BrickHeadz™ construction character featuring Chewbacca!&quot; ...
+ $ prod_id          : num  41597 41614 41613 41609 41608 ...
+ $ prod_long_desc   : chr  &quot;Fuel your creativity by making a LEGO® BrickHeadz version of yourself, friends and family or colleagues with th&quot;| __truncated__ &quot;These LEGO® BrickHeadz™ 41614 Owen &amp; Blue construction characters are fun to build using colorful LEGO bricks t&quot;| __truncated__ &quot;These LEGO® BrickHeadz™ 41613 Mr. Incredible &amp; Frozone construction characters are fun to build using colorful &quot;| __truncated__ &quot;This LEGO® BrickHeadz™ 41609 Chewbacca is fun to build using colorful LEGO bricks that recreate all of his icon&quot;| __truncated__ ...
+ $ review_difficulty: chr  &quot;Average&quot; &quot;Easy&quot; &quot;Very Easy&quot; &quot;Very Easy&quot; ...
+ $ set_name         : chr  &quot;Go Brick Me&quot; &quot;Owen &amp; Blue&quot; &quot;Mr. Incredible &amp; Frozone&quot; &quot;Chewbacca™&quot; ...
+ $ star_rating      : num  4.8 5 5 3 4 4.7 5 5 5 4.5 ...
+ $ theme_name       : chr  &quot;BrickHeadz&quot; &quot;BrickHeadz&quot; &quot;BrickHeadz&quot; &quot;BrickHeadz&quot; ...
+ $ val_star_rating  : num  4.8 5 5 4 4 4.5 5 5 NA 4 ...
+ $ country          : chr  &quot;US&quot; &quot;US&quot; &quot;US&quot; &quot;US&quot; ...
+ $ count            : int  765 765 765 765 765 765 765 765 765 765 ...
+ - attr(*, &quot;vars&quot;)= chr &quot;theme_name&quot;
+ - attr(*, &quot;drop&quot;)= logi TRUE
+ - attr(*, &quot;indices&quot;)=List of 15
+  ..$ : int  0 1 2 3 4 5 6 7 8 9 ...
+  ..$ : int  34 35 36 37 38 39 40 41 42 43 ...
+  ..$ : int  107 108 109 110 111 112 113 114 115 116 ...
+  ..$ : int  136 137 138 139 140 141 142 143 144 145 ...
+  ..$ : int  168 169 170 171 172 173 174 175 177 181 ...
+  ..$ : int  199 200 201 202 203 204 205 206 207 208 ...
+  ..$ : int  70 78 157 176 178 179 180 183 184 187 ...
+  ..$ : int  284 285 286 287 288 289 290 295 296 297 ...
+  ..$ : int  319 320 321 322 323 324 325 326 327 328 ...
+  ..$ : int  346 350 353 354 355 360 365 366 367 369 ...
+  ..$ : int  380 381 382 383 384 385 386 387 388 389 ...
+  ..$ : int  394 395 396 397 398 399 400 401 402 403 ...
+  ..$ : int  493 494 495 496 497 498 499 500 501 502 ...
+  ..$ : int  152 153 154 155 156 158 529 530 531 532 ...
+  ..$ : int  340 341 342 343 344 345 347 348 349 351 ...
+ - attr(*, &quot;group_sizes&quot;)= int  765 1092 403 317 285 606 978 414 303 263 ...
+ - attr(*, &quot;biggest_group_size&quot;)= int 1377
+ - attr(*, &quot;labels&quot;)=&#39;data.frame&#39;:  15 obs. of  1 variable:
+  ..$ theme_name: chr  &quot;BrickHeadz&quot; &quot;City&quot; &quot;Creator 3-in-1&quot; &quot;Creator Expert&quot; ...
+  ..- attr(*, &quot;vars&quot;)= chr &quot;theme_name&quot;
+  ..- attr(*, &quot;drop&quot;)= logi TRUE</code></pre>
+<p>In the first regression, we include the variables that we had previously mentioned, the <strong>theme</strong> and the number of pieces.</p>
+<pre><code>
+Call:
+lm(formula = log(list_price) ~ relevel(theme_name, ref = &quot;City&quot;) + 
+    piece_count, data = lego1)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-2.69332 -0.34043  0.02219  0.41903  1.60642 
+
+Coefficients:
+                                                             Estimate
+(Intercept)                                                 3.316e+00
+relevel(theme_name, ref = &quot;City&quot;)BrickHeadz                -7.966e-01
+relevel(theme_name, ref = &quot;City&quot;)Creator 3-in-1            -2.147e-01
+relevel(theme_name, ref = &quot;City&quot;)Creator Expert            -5.184e-02
+relevel(theme_name, ref = &quot;City&quot;)Disney™                    3.657e-02
+relevel(theme_name, ref = &quot;City&quot;)Friends                    5.890e-02
+relevel(theme_name, ref = &quot;City&quot;)Juniors                   -2.122e-01
+relevel(theme_name, ref = &quot;City&quot;)Marvel Super Heroes        8.938e-02
+relevel(theme_name, ref = &quot;City&quot;)Minecraft™                 1.774e-01
+relevel(theme_name, ref = &quot;City&quot;)NINJAGO®                  -2.079e-01
+relevel(theme_name, ref = &quot;City&quot;)Speed Champions           -1.782e-01
+relevel(theme_name, ref = &quot;City&quot;)Star Wars™                 1.965e-01
+relevel(theme_name, ref = &quot;City&quot;)Technic                    1.304e-01
+relevel(theme_name, ref = &quot;City&quot;)THE LEGO® BATMAN MOVIE     2.807e-01
+relevel(theme_name, ref = &quot;City&quot;)THE LEGO® NINJAGO® MOVIE™  8.160e-02
+piece_count                                                 7.605e-04
+                                                           Std. Error
+(Intercept)                                                 1.659e-02
+relevel(theme_name, ref = &quot;City&quot;)BrickHeadz                 2.556e-02
+relevel(theme_name, ref = &quot;City&quot;)Creator 3-in-1             3.155e-02
+relevel(theme_name, ref = &quot;City&quot;)Creator Expert             3.886e-02
+relevel(theme_name, ref = &quot;City&quot;)Disney™                    3.613e-02
+relevel(theme_name, ref = &quot;City&quot;)Friends                    2.742e-02
+relevel(theme_name, ref = &quot;City&quot;)Juniors                    2.389e-02
+relevel(theme_name, ref = &quot;City&quot;)Marvel Super Heroes        3.124e-02
+relevel(theme_name, ref = &quot;City&quot;)Minecraft™                 3.520e-02
+relevel(theme_name, ref = &quot;City&quot;)NINJAGO®                   3.719e-02
+relevel(theme_name, ref = &quot;City&quot;)Speed Champions            3.771e-02
+relevel(theme_name, ref = &quot;City&quot;)Star Wars™                 2.205e-02
+relevel(theme_name, ref = &quot;City&quot;)Technic                    2.956e-02
+relevel(theme_name, ref = &quot;City&quot;)THE LEGO® BATMAN MOVIE     2.877e-02
+relevel(theme_name, ref = &quot;City&quot;)THE LEGO® NINJAGO® MOVIE™  2.563e-02
+piece_count                                                 7.836e-06
+                                                           t value
+(Intercept)                                                199.933
+relevel(theme_name, ref = &quot;City&quot;)BrickHeadz                -31.170
+relevel(theme_name, ref = &quot;City&quot;)Creator 3-in-1             -6.805
+relevel(theme_name, ref = &quot;City&quot;)Creator Expert             -1.334
+relevel(theme_name, ref = &quot;City&quot;)Disney™                     1.012
+relevel(theme_name, ref = &quot;City&quot;)Friends                     2.148
+relevel(theme_name, ref = &quot;City&quot;)Juniors                    -8.881
+relevel(theme_name, ref = &quot;City&quot;)Marvel Super Heroes         2.861
+relevel(theme_name, ref = &quot;City&quot;)Minecraft™                  5.040
+relevel(theme_name, ref = &quot;City&quot;)NINJAGO®                   -5.591
+relevel(theme_name, ref = &quot;City&quot;)Speed Champions            -4.727
+relevel(theme_name, ref = &quot;City&quot;)Star Wars™                  8.911
+relevel(theme_name, ref = &quot;City&quot;)Technic                     4.412
+relevel(theme_name, ref = &quot;City&quot;)THE LEGO® BATMAN MOVIE      9.757
+relevel(theme_name, ref = &quot;City&quot;)THE LEGO® NINJAGO® MOVIE™   3.184
+piece_count                                                 97.053
+                                                           Pr(&gt;|t|)    
+(Intercept)                                                 &lt; 2e-16 ***
+relevel(theme_name, ref = &quot;City&quot;)BrickHeadz                 &lt; 2e-16 ***
+relevel(theme_name, ref = &quot;City&quot;)Creator 3-in-1            1.07e-11 ***
+relevel(theme_name, ref = &quot;City&quot;)Creator Expert             0.18224    
+relevel(theme_name, ref = &quot;City&quot;)Disney™                    0.31148    
+relevel(theme_name, ref = &quot;City&quot;)Friends                    0.03175 *  
+relevel(theme_name, ref = &quot;City&quot;)Juniors                    &lt; 2e-16 ***
+relevel(theme_name, ref = &quot;City&quot;)Marvel Super Heroes        0.00423 ** 
+relevel(theme_name, ref = &quot;City&quot;)Minecraft™                4.74e-07 ***
+relevel(theme_name, ref = &quot;City&quot;)NINJAGO®                  2.32e-08 ***
+relevel(theme_name, ref = &quot;City&quot;)Speed Champions           2.31e-06 ***
+relevel(theme_name, ref = &quot;City&quot;)Star Wars™                 &lt; 2e-16 ***
+relevel(theme_name, ref = &quot;City&quot;)Technic                   1.03e-05 ***
+relevel(theme_name, ref = &quot;City&quot;)THE LEGO® BATMAN MOVIE     &lt; 2e-16 ***
+relevel(theme_name, ref = &quot;City&quot;)THE LEGO® NINJAGO® MOVIE™  0.00146 ** 
+piece_count                                                 &lt; 2e-16 ***
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+Residual standard error: 0.5413 on 8875 degrees of freedom
+Multiple R-squared:  0.6684,    Adjusted R-squared:  0.6678 
+F-statistic:  1192 on 15 and 8875 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>So remember that my main question asks about the premium that we are likely to pay for <strong>“Themed”</strong> lego sets, which assumes that we expect the Classic lego sets to be the cheapest. From the regression results (so far), our assumption seems to be alright. The coefficient on the variable <strong>“piece count”</strong> is also positive, which is reasonable as we would expect a “larger” set with more pieces to cost more.</p>
+<pre><code>
+Call:
+lm(formula = log(list_price) ~ theme_name + log(piece_count) + 
+    ages + review_difficulty + star_rating, data = lego1)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.98797 -0.17469 -0.00373  0.16173  1.70040 
+
+Coefficients: (2 not defined because of singularities)
+                                     Estimate Std. Error t value Pr(&gt;|t|)
+(Intercept)                          2.273532   0.067042  33.912  &lt; 2e-16
+theme_nameBrickHeadz                -1.728017   0.047237 -36.582  &lt; 2e-16
+theme_nameCreator 3-in-1            -0.833844   0.023376 -35.670  &lt; 2e-16
+theme_nameCreator Expert            -1.079254   0.036961 -29.200  &lt; 2e-16
+theme_nameDisney™                   -0.138380   0.022569  -6.131 9.12e-10
+theme_nameFriends                   -0.411926   0.018941 -21.747  &lt; 2e-16
+theme_nameJuniors                   -0.757907   0.079015  -9.592  &lt; 2e-16
+theme_nameMarvel Super Heroes       -0.396997   0.022204 -17.880  &lt; 2e-16
+theme_nameMinecraft™                -0.696128   0.040786 -17.068  &lt; 2e-16
+theme_nameNINJAGO®                  -0.834839   0.029873 -27.947  &lt; 2e-16
+theme_nameSpeed Champions           -0.758928   0.028264 -26.851  &lt; 2e-16
+theme_nameStar Wars™                -0.462727   0.020060 -23.067  &lt; 2e-16
+theme_nameTechnic                   -0.817984   0.027457 -29.791  &lt; 2e-16
+theme_nameTHE LEGO® BATMAN MOVIE    -0.512400   0.023049 -22.231  &lt; 2e-16
+theme_nameTHE LEGO® NINJAGO® MOVIE™ -0.772178   0.022668 -34.064  &lt; 2e-16
+log(piece_count)                     0.550546   0.006068  90.731  &lt; 2e-16
+ages10-14                           -0.534294   0.076146  -7.017 2.46e-12
+ages10-16                           -0.084675   0.042370  -1.998  0.04570
+ages11-16                            0.150697   0.050086   3.009  0.00263
+ages12+                              0.108143   0.063634   1.699  0.08928
+ages12-16                           -0.032746   0.057894  -0.566  0.57166
+ages14+                              0.007689   0.046662   0.165  0.86912
+ages16+                              0.266186   0.049856   5.339 9.60e-08
+ages4-7                             -0.282358   0.065713  -4.297 1.75e-05
+ages5-12                            -1.109680   0.046871 -23.675  &lt; 2e-16
+ages5-8                                    NA         NA      NA       NA
+ages6+                              -1.448798   0.058341 -24.833  &lt; 2e-16
+ages6-12                            -0.856560   0.042108 -20.342  &lt; 2e-16
+ages6-14                            -0.624152   0.048859 -12.775  &lt; 2e-16
+ages7+                              -0.825660   0.207978  -3.970 7.25e-05
+ages7-12                            -0.550966   0.042955 -12.827  &lt; 2e-16
+ages7-14                            -0.569504   0.039808 -14.306  &lt; 2e-16
+ages8+                              -0.241984   0.056628  -4.273 1.95e-05
+ages8-12                            -0.472828   0.045297 -10.438  &lt; 2e-16
+ages8-14                            -0.325978   0.039215  -8.312  &lt; 2e-16
+ages9-12                            -0.332107   0.076460  -4.344 1.42e-05
+ages9-14                            -0.177066   0.041215  -4.296 1.76e-05
+ages9-16                                   NA         NA      NA       NA
+review_difficulty                   -0.153246   0.021597  -7.096 1.40e-12
+review_difficultyAverage             0.030950   0.015820   1.956  0.05045
+review_difficultyChallenging         0.158399   0.021251   7.454 1.00e-13
+review_difficultyEasy               -0.121414   0.012936  -9.385  &lt; 2e-16
+review_difficultyVery Challenging    0.072425   0.105846   0.684  0.49384
+star_rating                         -0.124593   0.006792 -18.345  &lt; 2e-16
+                                       
+(Intercept)                         ***
+theme_nameBrickHeadz                ***
+theme_nameCreator 3-in-1            ***
+theme_nameCreator Expert            ***
+theme_nameDisney™                   ***
+theme_nameFriends                   ***
+theme_nameJuniors                   ***
+theme_nameMarvel Super Heroes       ***
+theme_nameMinecraft™                ***
+theme_nameNINJAGO®                  ***
+theme_nameSpeed Champions           ***
+theme_nameStar Wars™                ***
+theme_nameTechnic                   ***
+theme_nameTHE LEGO® BATMAN MOVIE    ***
+theme_nameTHE LEGO® NINJAGO® MOVIE™ ***
+log(piece_count)                    ***
+ages10-14                           ***
+ages10-16                           *  
+ages11-16                           ** 
+ages12+                             .  
+ages12-16                              
+ages14+                                
+ages16+                             ***
+ages4-7                             ***
+ages5-12                            ***
+ages5-8                                
+ages6+                              ***
+ages6-12                            ***
+ages6-14                            ***
+ages7+                              ***
+ages7-12                            ***
+ages7-14                            ***
+ages8+                              ***
+ages8-12                            ***
+ages8-14                            ***
+ages9-12                            ***
+ages9-14                            ***
+ages9-16                               
+review_difficulty                   ***
+review_difficultyAverage            .  
+review_difficultyChallenging        ***
+review_difficultyEasy               ***
+review_difficultyVery Challenging      
+star_rating                         ***
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+Residual standard error: 0.2873 on 8076 degrees of freedom
+  (773 observations deleted due to missingness)
+Multiple R-squared:   0.91, Adjusted R-squared:  0.9095 
+F-statistic:  1991 on 41 and 8076 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div id="marginal-effects" class="section level2">
+<h2>Marginal Effects</h2>
+<p>I must admit, looking at the regression results doesn’t really help visualize our findings, so we turn to looking at the average marginal effects instead. From the results, we see that out of all the themes, the <strong>“City”</strong> theme seems to be the most expensive of the lot, at 163% the price of a <strong>“Classic”</strong> set, and this is after controlling for piece count and other possible variables such as the target age and difficulty of each set. This is quite surprising to me, given that I see the City sets as a mainstay of the Lego brand and is somewhat of an in-house brand. By comparison, one would expect lego sets with trademark brands such as Disney or Marvel to be more expensive instead given that lego would likely have to acquire the rights, pay some licensing fees, and this additional cost would lead to more expensive sets.</p>
+</div>
+<div id="city-sets-still-more-expensive-followed-closely-behind-by-disney-and-marvel-sets" class="section level2">
+<h2>City sets still more expensive, followed closely behind by Disney and Marvel sets</h2>
+<p>Nonetheless, that hypothesis still may hold as we see <strong>Disney</strong> sets and <strong>Marvel Super Heroes</strong> set close behind the City themed sets. And in fact, the coefficients really make you wonder about how much these licensing fees cost, given that these themed sets can cost up to over 100% more than a normal <strong>Classic</strong> set.</p>
+<pre><code> piece_count star_rating theme_nameBrickHeadz theme_nameCreator 3-in-1
+    0.002939     -0.1246               -1.728                  -0.8338
+ theme_nameCreator Expert theme_nameDisney™ theme_nameFriends
+                   -1.079           -0.1384           -0.4119
+ theme_nameJuniors theme_nameMarvel Super Heroes theme_nameMinecraft™
+           -0.7579                        -0.397              -0.6961
+ theme_nameNINJAGO® theme_nameSpeed Champions theme_nameStar Wars™
+            -0.8348                   -0.7589              -0.4627
+ theme_nameTechnic theme_nameTHE LEGO® BATMAN MOVIE
+            -0.818                          -0.5124
+ theme_nameTHE LEGO® NINJAGO® MOVIE™ ages10-14 ages10-16 ages11-16 ages12+
+                             -0.7722   -0.5343  -0.08467    0.1507  0.1081
+ ages12-16  ages14+ ages16+ ages4-7 ages5-12 ages5-8 ages6+ ages6-12
+  -0.03275 0.007689  0.2662 -0.2824    -1.11       0 -1.449  -0.8566
+ ages6-14  ages7+ ages7-12 ages7-14 ages8+ ages8-12 ages8-14 ages9-12
+  -0.6242 -0.8257   -0.551  -0.5695 -0.242  -0.4728   -0.326  -0.3321
+ ages9-14 ages9-16 review_difficulty review_difficultyAverage
+  -0.1771        0           -0.1532                  0.03095
+ review_difficultyChallenging review_difficultyEasy
+                       0.1584               -0.1214
+ review_difficultyVery Challenging
+                           0.07242</code></pre>
+<pre><code>                       xvals    yvals    upper    lower
+1                       City 4.250548 4.282028 4.219067
+2                 BrickHeadz 2.522531 2.612718 2.432344
+3             Creator 3-in-1 3.416704 3.459432 3.373975
+4             Creator Expert 3.171294 3.241149 3.101438
+5                    Disney™ 4.112167 4.153657 4.070677
+6                    Friends 3.838621 3.869225 3.808018
+7                    Juniors 3.492641 3.647162 3.338119
+8        Marvel Super Heroes 3.853551 3.890931 3.816170
+9                 Minecraft™ 3.554419 3.632291 3.476548
+10                  NINJAGO® 3.415709 3.470815 3.360602
+11           Speed Champions 3.491620 3.541820 3.441419
+12                Star Wars™ 3.787821 3.819367 3.756276
+13                   Technic 3.432563 3.481068 3.384059
+14    THE LEGO® BATMAN MOVIE 3.738147 3.777462 3.698833
+15 THE LEGO® NINJAGO® MOVIE™ 3.478370 3.516406 3.440334</code></pre>
+<p><img src="/post/2018-06-03-how-much-more-are-you-paying-for-themed-lego-sets_files/figure-html/regression3-1.png" width="1344" /></p>
+<p>And so I leave you with this plot of prices of sets for the 3 selected themes: <strong>City, Disney and Marvel Super Heroes</strong>. <strong>City</strong> sets definitely look cheaper and all, but piece for piece, and considering other factors, are you merely paying a lower price in absolute terms but not getting the bang for your buck as compared to buying a themed set? I guess the answer from this analysis is that that may be true!</p>
+<p>So.. more importantly, how will this affect your next lego purchase? :)</p>
+<p><img src="/post/2018-06-03-how-much-more-are-you-paying-for-themed-lego-sets_files/figure-html/density-1.png" width="1152" /></p>
+</div>

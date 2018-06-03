@@ -1,0 +1,183 @@
+---
+title: How much more are you paying for themed lego sets?
+author: geekyboy88
+date: '2018-06-03'
+slug: how-much-more-are-you-paying-for-themed-lego-sets
+categories:
+  - lego
+  - Analytics
+tags:
+  - lego
+  - analytics
+---
+
+<style type="text/css">
+
+body, td {
+   font-size: 18px;
+}
+code.r{
+  font-size: 18px;
+}
+pre {
+  font-size: 18px
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning=FALSE, echo=FALSE, comment=NA, message=FALSE)
+```
+
+## Lego
+
+For my next post, I will be looking through data on something relatively closer to my heart, __LEGO__! But I must admit first and foremost that I was not always an avid Lego collector. I was very fortunate to have been able to play with these toys during my childhood (_as it isn't exactly the cheapest of toys and I have to thank my parents for that_). I soon outgrew them as I moved on to JC and NS. However, when I was studying in the University, I stumbled upon one of the latest sets by random chance: a pretty awesome __Hogwarts Castle__ set. I was intrigued and from then on, I really started to expand my collection. 
+
+## Kernel on lego set price prediction
+
+Recently, I stumbled upon a kernel done by [Johnathan Bouchet](https://www.kaggle.com/jonathanbouchet/are-lego-sets-too-pricey?utm_medium=email&utm_source=mailchimp&utm_campaign=data-notes-may-31), where he attempted to predict the price of a lego set based on some pre-defined variables. 
+
+## Motivation
+
+His kernel got me to think: __what is the premium that we pay for sets of a particular theme?__ To provide some context, maybe we can take a quick look at the data.
+
+```{r loadpackages,echo=TRUE,results='hide'}
+rm(list=ls())
+packages = c("magrittr","rvest","plyr","dplyr","stringr","stringi","tidyr","ggplot2","scales","knitr","margins")
+lapply(packages, require, character.only = TRUE)
+rm(packages)
+```
+
+This is what the data looks like. There are 14 variables in this dataset, but not all of which we going to use.
+
+```{r loaddata}
+lego1 = read.csv("../../static/data/lego_sets.csv", stringsAsFactors = F)
+head(lego1)
+```
+
+To start off, let's take a quick look at the number of themes in this dataset. As you can tell from the chart below summarising the number of sets per theme, there are quite a number of themes. Some of the themes are relatively newer or may just have lesser sets in general, so we may want to omit those as we may not be able to draw any conclusions from themes where the sample size is small. To do this, I dropped themes that have less than 250 sets. The 250 minimum number of sets cut-off is determined _partly arbitarily and partly by eyeballing_ the chart below. I would also drop the __DIMENSIONS__ and __MINDSTORM__ sets since these sets are not your typical lego sets, and the __DUPLO__ sets given that the size of the pieces are not really comparable (_this will be explained in a later section_).  
+
+```{r categories1, message=FALSE, error=FALSE,fig.height=9,fig.width=12}
+lego1 %>%
+  group_by(theme_name) %>%
+  summarise(count = n()) %>%
+  ggplot(aes(x = reorder(theme_name, count), y = count, fill = count)) +
+  geom_bar(position = position_dodge(), stat = "identity") +
+  coord_flip() +
+  theme_classic() +
+  theme(text = element_text(size = 16)) +
+  labs(x = "Theme", y = "Number of Sets Per Theme", fill = "Number of Sets") +
+  scale_fill_gradient(high = "red", low = "yellow") +
+  geom_hline(yintercept = 250)
+```
+
+So that leaves us with 21 remaining themes.
+
+```{r categories2}
+lego1 %<>%
+  group_by(theme_name) %>%
+  mutate(count = n()) %>%
+  filter(count > 250) %>%
+  filter(!(theme_name %in% c("DIMENSIONS™","MINDSTORMS®","DUPLO®","Classic")))
+```
+
+## Price Differences
+
+Next, we can see broadly if there are some price differences between themes.
+
+```{r prices1,fig.height=9,fig.width=10}
+lego1 %>%
+  group_by(theme_name) %>%
+  summarise(avg_price = mean(list_price)) %>%
+  ggplot(aes(x = reorder(theme_name, avg_price), y = avg_price, fill = avg_price)) +
+  geom_bar(stat = "identity", position = position_dodge()) +
+  geom_label(aes(label = dollar(avg_price))) +
+  coord_flip() +
+  theme_classic() +
+  theme(text = element_text(size = 16),
+        legend.position = "none") +
+  labs(x = "Theme", y = "Average Price of a Set", fill = "Average Price") +
+  scale_fill_gradient(high = "green", low = "red")
+```
+
+As we see, the average prices of __Classic__ sets is right at the bottom of the table at __$20.68__, suggesting that there could be a premium that we pay for the other __"THEMED"__ sets. However, it is also quite telling to note that the __Classic__ sets are not quite the bottom, and __BrickHeadz__ sets costs lesser instead. For those of you who are not familiar with the __BrickHeadz__ sets, these are generally smaller sets with a lower piece counts than the average set. What this implies is that we should also take into consideration other factors that might affect the differences in prices of sets between lego themes.
+
+Let's do some further investigation on this.
+
+## Piece Count
+
+```{r piececount1,fig.height=8,fig.width=9}
+lego1 %>%
+  group_by(theme_name) %>%
+  summarise(avg_piece = mean(piece_count)) %>%
+  ggplot(aes(x = reorder(theme_name, avg_piece), y = avg_piece, fill = avg_piece)) +
+  geom_bar(stat = "identity", position = position_dodge()) +
+  geom_label(aes(label = round(avg_piece,0))) +
+  coord_flip() +
+  theme_classic() +
+  theme(text = element_text(size = 16),
+        legend.position = "none") +
+  labs(x = "Theme", y = "Average Number of Pieces per Set", fill = "Average Number of Pieces") +
+  scale_fill_gradient(high = "green", low = "red")
+```
+
+And with that, we can now move on to the regression. Just to again refresh the variables that we have available.
+
+```{r regression}
+str(lego1)
+```
+
+In the first regression, we include the variables that we had previously mentioned, the __theme__ and the number of pieces. 
+
+```{r regression1}
+lego1$theme_name %<>% as.factor()
+model1 = lm(log(list_price) ~ relevel(theme_name, ref = "City") + piece_count, data = lego1)
+summary(model1)
+rm(model1)
+```
+
+So remember that my main question asks about the premium that we are likely to pay for __"Themed"__ lego sets, which assumes that we expect the Classic lego sets to be the cheapest. From the regression results (so far), our assumption seems to be alright. The coefficient on the variable __"piece count"__ is also positive, which is reasonable as we would expect a "larger" set with more pieces to cost more.
+
+
+
+```{r regression2}
+lego1$theme_name %<>% 
+  as.factor() %>% 
+  relevel(ref = "City")
+lego1$review_difficulty %<>% 
+  as.factor() %>%
+  relevel(ref = "Very Easy")
+lego1$ages %<>% 
+  as.factor()
+model2 = lm(log(list_price) ~ theme_name + log(piece_count) + ages + review_difficulty + star_rating, data = lego1)
+summary(model2)
+```
+
+## Marginal Effects
+
+I must admit, looking at the regression results doesn't really help visualize our findings, so we turn to looking at the average marginal effects instead. From the results, we see that out of all the themes, the __"City"__ theme seems to be the most expensive of the lot, at 163% the price of a __"Classic"__ set, and this is after controlling for piece count and other possible variables such as the target age and difficulty of each set. This is quite surprising to me, given that I see the City sets as a mainstay of the Lego brand and is somewhat of an in-house brand. By comparison, one would expect lego sets with trademark brands such as Disney or Marvel to be more expensive instead given that lego would likely have to acquire the rights, pay some licensing fees, and this additional cost would lead to more expensive sets. 
+
+## City sets still more expensive, followed closely behind by Disney and Marvel sets
+
+Nonetheless, that hypothesis still may hold as we see __Disney__ sets and __Marvel Super Heroes__ set close behind the City themed sets. And in fact, the coefficients really make you wonder about how much these licensing fees cost, given that these themed sets can cost up to over 100% more than a normal __Classic__ set. 
+
+```{r regression3,fig.width=14,fig.height=12}
+margins(model2)
+cplot(model2, "theme_name")
+```
+
+And so I leave you with this plot of prices of sets for the 3 selected themes: __City, Disney and Marvel Super Heroes__. __City__ sets definitely look cheaper and all, but piece for piece, and considering other factors, are you merely paying a lower price in absolute terms but not getting the bang for your buck as compared to buying a themed set? I guess the answer from this analysis is that that may be true! 
+
+So.. more importantly, how will this affect your next lego purchase? :)
+
+```{r density,fig.width=12,fig.height=10}
+lego1 %>%
+  filter(theme_name %in% c("City","Disney™","Marvel Super Heroes")) %>%
+  ggplot(aes(x = list_price, fill = theme_name, colour = theme_name)) +
+  geom_density(alpha = 0.5) +
+  theme_classic() +
+  scale_color_discrete(guide = FALSE) +
+  labs(x = "Set Price",y = "Density", fill = "Theme", colour = "") +
+  theme(text = element_text(size = 16),
+        legend.position = "bottom")
+```
+
